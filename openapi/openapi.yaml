@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Paperless Document Management REST-Server
+  description: DMS
+  contact:
+    name: SWEN3
+  version: 1.0.0
+servers:
+  - url: 'localhost:8081'
+tags:
+  - name: paperless
+    description: Paperless Document Management REST-API
+paths:
+  /api/documents:
+    post:
+      tags:
+        - paperless
+      summary: "Create a new document"
+      operationId: createDocument
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/document'
+        required: true
+      responses:
+        201:
+          description: "Document successfully created."
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/document'
+        400:
+          description: "Document creation failed due to bad request!"
+    get:
+      tags:
+        - paperless
+      summary: "Returns a list of documents"
+      operationId: getDocuments
+      responses:
+        200:
+          description: "Success"
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/documents'
+
+  /api/documents/{id}:
+    get:
+      tags:
+        - paperless
+      summary: "Retrieve a document by id"
+      operationId: getDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The id of the document
+      responses:
+        200:
+          description: "Success"
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/document'
+        404:
+          description: "Document does not exist with this id!"
+    put:
+      tags:
+        - paperless
+      summary: "Update a document by id"
+      operationId: updateDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The id of the document
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/document'
+        required: true
+      responses:
+        200:
+          description: "Success"
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/document'
+        404:
+          description: "Document does not exist with this id!"
+    delete:
+      tags:
+        - paperless
+      summary: "Delete a document by id"
+      operationId: deleteDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The id of the document
+      responses:
+        204:
+          description: "Document deleted successfully"
+        404:
+          description: "Document does not exist with this id!"
+
+components:
+  schemas:
+    document:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "The unique id of the document"
+        title:
+          type: string
+          description: "The title of the document"
+        author:
+          type: string
+          description: "The author of the document"
+        content:
+          type: string
+          description: "The content of the document"
+        uploadDate:
+          type: string
+          format: date-time
+          description: "When the document was uploaded"
+      required:
+        - title
+        - author
+        - content
+
+    documents:
+      type: array
+      items:
+        $ref: '#/components/schemas/document'
