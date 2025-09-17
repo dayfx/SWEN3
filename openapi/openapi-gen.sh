@@ -38,6 +38,5 @@ unset MSYS_NO_PATHCONV
 rm -f ./out/src/main/java/com/fhtechnikum/paperless/services/OpenApiGeneratorApplication.java
 rm -f ./out/src/main/java/com/fhtechnikum/paperless/controller/PaperlessApiController.java
 
-# Copy all generated files to PaperlessREST module
+# Copy all generated files to PaperlessREST module (dont copy pom.xml)
 cp -rf ./out/src/* ../PaperlessREST/src/
-cp ./out/pom.xml ../PaperlessREST/pom.xml
