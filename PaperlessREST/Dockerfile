@@ -3,8 +3,8 @@ ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
 ADD .. $HOME
-RUN mvn package
+RUN mvn package -DskipTests
 
-FROM openjdk:21-jdk-alpine
+FROM openjdk:21
 COPY --from=build /usr/app/PaperlessREST/target/*.jar /app/runner.jar
 ENTRYPOINT ["java", "-jar", "/app/runner.jar"]
