@@ -11,3 +11,4 @@ public interface DocumentService {
     Document updateDocument(Long id, Document document);
     boolean deleteDocument(Long id);
 }
+
