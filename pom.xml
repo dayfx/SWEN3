@@ -11,6 +11,7 @@
     <groupId>com.fhtechnikum</groupId>
     <artifactId>SWEN3</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>SWEN3</name>
     <description>SWEN3</description>
     <url/>
@@ -20,6 +21,9 @@
     <developers>
         <developer/>
     </developers>
+    <modules>
+        <module>PaperlessREST</module>
+    </modules>
     <scm>
         <connection/>
         <developerConnection/>

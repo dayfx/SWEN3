@@ -1,0 +1,168 @@
+### Paperless REST API Test Collection
+### Environment Variables
+@baseUrl = http://localhost:8081
+@contentType = application/json
+
+### Start serviceswith: docker-compose up -d
+
+### 1. Health Check - Get all documents (should return empty array initially)
+GET {{baseUrl}}/api/documents
+Accept: {{contentType}}
+
+###
+
+### 2. Create a new document
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": "Test Document 1",
+  "author": "John Doe",
+  "content": "This is the content of the first test document. It contains some sample text to verify that the document creation works properly."
+}
+
+###
+
+### 3. Create another document
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": "Sprint Planning Notes",
+  "author": "Jane Smith", 
+  "content": "Sprint 1 objectives: Setup project, implement REST API, configure database, write unit tests, containerize with Docker."
+}
+
+###
+
+### 4. Get all documents (should now show the created documents)
+GET {{baseUrl}}/api/documents
+Accept: {{contentType}}
+
+###
+
+### 5. Get specific document by ID (replace {id} with actual ID from step 2 response)
+GET {{baseUrl}}/api/documents/1
+Accept: {{contentType}}
+
+###
+
+### 6. Update a document (replace {id} with actual ID)
+PUT {{baseUrl}}/api/documents/1
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated Test Document 1",
+  "author": "John Doe",
+  "content": "This is the UPDATED content of the first test document. The update functionality is working correctly."
+}
+
+###
+
+### 7. Verify the update worked
+GET {{baseUrl}}/api/documents/1
+Accept: {{contentType}}
+
+###
+
+### 8. Get all documents to see final state
+GET {{baseUrl}}/api/documents
+Accept: {{contentType}}
+
+###
+
+### 9. Delete a document (replace {id} with actual ID)
+DELETE {{baseUrl}}/api/documents/2
+
+###
+
+### 10. Verify deletion - Get all documents (should show one less document)
+GET {{baseUrl}}/api/documents
+Accept: {{contentType}}
+
+###
+
+### 11. Try to get deleted document (should return 404)
+GET {{baseUrl}}/api/documents/2
+Accept: {{contentType}}
+
+###
+
+### 12. Test error handling - Create document with missing required fields
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": "Incomplete Document"
+}
+
+###
+
+### 13. Test error handling - Update non-existent document
+PUT {{baseUrl}}/api/documents/999
+Content-Type: {{contentType}}
+
+{
+  "title": "Non-existent Document",
+  "author": "Test",
+  "content": "This should return 404"
+}
+
+###
+
+### 14. Test error handling - Delete non-existent document
+DELETE {{baseUrl}}/api/documents/999
+
+###
+
+### 15. Test with empty strings (should fail validation)
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": "",
+  "author": "",
+  "content": ""
+}
+
+###
+
+### 16. Test with null values (should fail validation)
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": null,
+  "author": null,
+  "content": null
+}
+
+###
+
+### 17. Test with very long content
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": "Long Content Test",
+  "author": "Test Author",
+  "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+}
+
+###
+
+### 18. Test malformed JSON (should return 400)
+POST {{baseUrl}}/api/documents
+Content-Type: {{contentType}}
+
+{
+  "title": "Malformed JSON",
+  "author": "Test Author"
+  "content": "Missing comma above"
+}
+
+###
+
+### 19. Final cleanup - Get all documents to see final state
+GET {{baseUrl}}/api/documents
+Accept: {{contentType}}
