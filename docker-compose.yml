@@ -10,5 +10,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  paperless-rest:
+    build:
+      context: .
+      dockerfile: PaperlessREST/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paperless
+      - SPRING_DATASOURCE_USERNAME=paperless
+      - SPRING_DATASOURCE_PASSWORD=paperless
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:
+

@@ -66,6 +66,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     // Simple conversion methods (business logic layer)
+    //TODO: Delete after implementing MapStruct (DocumentMapper)
     private Document entityToDto(DocumentEntity entity) {
         Document dto = new Document();
         dto.setId(entity.getId());
@@ -78,6 +79,7 @@ public class DocumentServiceImpl implements DocumentService {
         return dto;
     }
 
+    //TODO: Delete after implementing MapStruct (DocumentMapper)
     private DocumentEntity dtoToEntity(Document dto) {
         DocumentEntity entity = new DocumentEntity();
         entity.setTitle(dto.getTitle());
