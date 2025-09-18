@@ -80,6 +80,7 @@ public class Document {
    * @return title
    */
   @NotNull 
+  @NotBlank(message = "Title cannot be empty")
   @Schema(name = "title", description = "The title of the document", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("title")
   public String getTitle() {
@@ -100,6 +101,7 @@ public class Document {
    * @return author
    */
   @NotNull 
+  @NotBlank(message = "Author cannot be empty")
   @Schema(name = "author", description = "The author of the document", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("author")
   public String getAuthor() {
@@ -120,6 +122,7 @@ public class Document {
    * @return content
    */
   @NotNull 
+  @NotBlank(message = "Content cannot be empty")
   @Schema(name = "content", description = "The content of the document", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("content")
   public String getContent() {
