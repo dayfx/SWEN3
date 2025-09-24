@@ -6,7 +6,6 @@ import com.fhtechnikum.paperless.services.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,7 @@ public class PaperlessApiControllerImpl implements PaperlessApi {
     }
 
     @Override
-    public ResponseEntity<Document> createDocument(@Valid Document document) {
+    public ResponseEntity<Document> createDocument(Document document) {
         Document created = documentService.createDocument(document);
         return ResponseEntity.status(201).body(created);
     }
@@ -37,7 +36,7 @@ public class PaperlessApiControllerImpl implements PaperlessApi {
     }
 
     @Override
-    public ResponseEntity<Document> updateDocument(Long id, @Valid Document document) {
+    public ResponseEntity<Document> updateDocument(Long id, Document document) {
         Document updated = documentService.updateDocument(id, document);
         if (updated != null) {
             return ResponseEntity.ok(updated);
