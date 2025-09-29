@@ -23,6 +23,12 @@ services:
     depends_on:
       - postgres
 
+  web-ui:
+    build: web-ui/
+    restart: unless-stopped
+    ports:
+      - 80:80
+
 volumes:
   postgres_data:
 
