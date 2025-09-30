@@ -1,33 +1,49 @@
 // Auto-load documents when page loads
-document.addEventListener('DOMContentLoaded', loadDocuments);
+document.addEventListener('DOMContentLoaded', loadDocumentsCards);
 // Modal instance
 const documentModal = new bootstrap.Modal(document.getElementById('documentModal'));
 
-function loadDocuments() {
+function loadDocumentsCards() {
     fetch('/api/documents')
         .then(response => response.json())
         .then(data => {
-            const documentsTableBody = document.getElementById('documentsTableBody');
-            documentsTableBody.innerHTML = '';
+            const cardsContainer = document.getElementById('documentCardsContainer');
+            cardsContainer.innerHTML = '';
+
             if (data.length === 0) {
-                const row = `<tr><td colspan="4" class="text-center text-muted">No documents found.</td></tr>`;
-                documentsTableBody.innerHTML = row;
+                const message = `
+                    <div class="col-12">
+                        <div class="text-center p-5 bg-light rounded">
+                            <h4>No documents found.</h4>
+                            <p>Why not <a href="/upload.html">upload</a> one?</p>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.innerHTML = message;
                 return;
             }
+
             data.forEach((document) => {
                 const uploadDate = document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : 'N/A';
-                const row = `
-                        <tr>
-                            <th scope="row">${document.id}</th>
-                            <td>${document.title}</td>
-                            <td>${uploadDate}</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" onclick="viewDocument(${document.id})">View</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteDocument(${document.id})">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                documentsTableBody.insertAdjacentHTML('beforeend', row);
+
+                const cardHTML = `
+                    <div class="col-sm-12 col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${document.title}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Uploaded: ${uploadDate}</h6>
+                                <p class="card-text small text-muted">ID: ${document.id}</p>
+                                
+                                <!-- mt-auto pushes the buttons to the bottom of the card -->
+                                <div class="mt-auto text-end">
+                                    <button class="btn btn-primary btn-sm" onclick="viewDocument(${document.id})">View</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteDocument(${document.id})">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.insertAdjacentHTML('beforeend', cardHTML);
             });
         })
         .catch(error => console.error('Error fetching documents:', error));
