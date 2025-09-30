@@ -47,8 +47,8 @@
                     <input type="text" class="form-control" id="documentTitle" name="document" placeholder="Enter document title" required>
                 </div>
                 <div class="form-group">
-                    <label for="fileInput">Select File</label>
-                    <input type="file" class="form-control-file" id="fileInput" name="file" required>
+                    <label for="fileInput">Select File (works only with .txt for now)</label>
+                    <input type="file" class="form-control-file" id="fileInput" name="file" accept=".txt" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Upload Document</button>
             </form>
@@ -71,30 +71,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>    <!-- Fetch and Display Documents -->
 
 
-<script>
-    document.getElementById('uploadForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        const form = document.getElementById('uploadForm');
-        const formData = new FormData(form);
-
-        fetch('/api/documents/post_document', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('message').innerHTML =
-                        '<div class="alert alert-success" role="alert">Document successfully uploaded!</div>';
-                } else {
-                    throw new Error('Upload failed!');
-                }
-            })
-            .catch(error => {
-                document.getElementById('message').innerHTML =
-                    '<div class="alert alert-danger" role="alert">Document upload failed due to bad request!</div>';
-            });
-    });
-</script>
+<script src="/js/upload.js"></script>
 </body>
 </html>
