@@ -27,16 +27,18 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
         })
             .then(response => {
                 if (response.ok) {
-                    document.getElementById('message').innerHTML =
-                        '<div class="alert alert-success" role="alert">Document successfully uploaded!</div>';
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.className = 'alert alert-success mt-3';
+                    messageDiv.textContent = 'Document successfully uploaded!';
                     document.getElementById('uploadForm').reset();
                 } else {
                     throw new Error('Upload failed!');
                 }
             })
             .catch(error => {
-                document.getElementById('message').innerHTML =
-                    '<div class="alert alert-danger" role="alert">Document upload failed!</div>';
+                const messageDiv = document.getElementById('message');
+                messageDiv.className = 'alert alert-danger mt-3';
+                messageDiv.textContent = 'Document upload failed! ' + error.message;
             });
 
     } catch (error) {
