@@ -10,9 +10,12 @@ rm -rf ../PaperlessREST/src/test/java/*
 # Disable Git Bash path conversion for Docker
 export MSYS_NO_PATHCONV=1
 
+# Get the current directory
+CURRENT_DIR="$(pwd)"
+
 # Generate Spring Boot code using OpenAPI spec
 docker run --rm \
-  -v "/c/Users/Andy/Desktop/SWEN3/openapi:/workspace" \
+  -v "${CURRENT_DIR}:/workspace" \
   -w /workspace \
   openapitools/openapi-generator-cli generate \
   -i openapi.yaml \
