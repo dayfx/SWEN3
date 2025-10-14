@@ -141,3 +141,4 @@ docs/generated/
 *.backup
 *.bak
 .env
+/docs/

@@ -1,5 +1,6 @@
 package com.fhtechnikum.paperless.services.impl;
 
+import com.fhtechnikum.paperless.messaging.DocumentMessageProducer;
 import com.fhtechnikum.paperless.services.mapper.DocumentMapper; // <-- IMPORT YOUR MAPPER
 import com.fhtechnikum.paperless.services.DocumentService;
 import com.fhtechnikum.paperless.services.dto.Document;
@@ -19,11 +20,15 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
+    private final DocumentMessageProducer messageProducer;
 
-    // constructor injection for both dependencies
-    public DocumentServiceImpl(DocumentRepository documentRepository, DocumentMapper documentMapper) {
+    // constructor injection for all dependencies
+    public DocumentServiceImpl(DocumentRepository documentRepository,
+                              DocumentMapper documentMapper,
+                              DocumentMessageProducer messageProducer) {
         this.documentRepository = documentRepository;
         this.documentMapper = documentMapper;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -32,6 +37,12 @@ public class DocumentServiceImpl implements DocumentService {
         DocumentEntity entity = documentMapper.toEntity(document);
         entity.setUploadDate(LocalDateTime.now());
         DocumentEntity saved = documentRepository.save(entity);
+
+        // Send RabbitMQ message for OCR processing
+        // 'title' as filename placeholder
+        // TODO: update to 'entity.getFilename()' after file handling done
+        messageProducer.sendOcrMessage(saved.getId(), saved.getTitle());
+
         // mapper to convert the saved Entity back to a DTO
         return documentMapper.toDto(saved);
     }

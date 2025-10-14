@@ -14,6 +14,9 @@ public class DocumentEntity {
     private String title;
 
     @Column(nullable = false)
+    private String originalFilename;
+
+    @Column(nullable = false)
     private String author;
 
     @Column(columnDefinition = "TEXT")

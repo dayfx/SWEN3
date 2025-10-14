@@ -5,15 +5,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.fhtechnikum</groupId>
-    <artifactId>SWEN3</artifactId>
+    <artifactId>PaperlessServices</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>SWEN3</name>
-    <description>SWEN3</description>
+    <name>PaperlessServices</name>
+    <description>PaperlessServices</description>
     <url/>
     <licenses>
         <license/>
@@ -21,10 +20,6 @@
     <developers>
         <developer/>
     </developers>
-    <modules>
-        <module>PaperlessREST</module>
-        <module>PaperlessServices</module>
-    </modules>
     <scm>
         <connection/>
         <developerConnection/>
@@ -35,11 +30,25 @@
         <java.version>21</java.version>
     </properties>
     <dependencies>
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- RabbitMQ for consuming messages from queue -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <!-- Jackson for JSON serialization/deserialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <dependency>
@@ -47,7 +56,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
