@@ -39,6 +39,7 @@ SWEN3/
 │   ├── Dockerfile
 │   └── nginx.conf
 │
+├── .env.sample                   # Environment template
 ├── docker-compose.yml
 ├── pom.xml
 └── README.md
@@ -73,9 +74,40 @@ cd SWEN3
 
 ### Environment Variables
 
-(will be changed)
+All environment variables are configured in the `.env` file. The project includes a `.env.sample` file with default values for Docker Compose.
 
-Currently all environment variables are hardcoded directly in `docker-compose.yml`.
+Copy and modify if needed:
+```bash
+cp .env.sample .env
+```
+
+Default values from `.env.sample`:
+
+```bash
+# Database Configuration
+POSTGRES_DB=paperless
+POSTGRES_USER=paperless
+POSTGRES_PASSWORD=paperless
+
+# RabbitMQ Configuration
+RABBITMQ_HOST=queue
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
+
+# Spring Datasource (for Docker)
+SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paperless
+SPRING_DATASOURCE_USERNAME=paperless
+SPRING_DATASOURCE_PASSWORD=paperless
+
+# Spring RabbitMQ
+SPRING_RABBITMQ_HOST=queue
+SPRING_RABBITMQ_PORT=5672
+SPRING_RABBITMQ_USERNAME=guest
+SPRING_RABBITMQ_PASSWORD=guest
+```
+
+These values work out-of-the-box for Docker Compose. For local development without Docker, the `application.properties` files contain localhost defaults.
 
 ### Build Project
 
@@ -114,56 +146,4 @@ After starting, the following URLs are available:
 - REST API: http://localhost:8081
 - RabbitMQ Management: http://localhost:15672 (guest/guest)
 - PostgreSQL: localhost:5432 (paperless/paperless)
-
-## Development
-
-### OpenAPI Code Generation
-
-```bash
-cd openapi
-./openapi-gen.sh
-```
-
-
-### Compile MapStruct
-
-```bash
-mvn clean compile
-```
-
-## Environment Variables
-
-(will be changed)
-
-### PaperlessREST
-
-- `SPRING_DATASOURCE_URL`
-- `SPRING_DATASOURCE_USERNAME`
-- `SPRING_DATASOURCE_PASSWORD`
-- `SPRING_RABBITMQ_HOST`
-- `SPRING_RABBITMQ_PORT`
-- `SPRING_RABBITMQ_USERNAME`
-- `SPRING_RABBITMQ_PASSWORD`
-
-### PaperlessServices
-
-- `SPRING_RABBITMQ_HOST`
-- `SPRING_RABBITMQ_PORT`
-- `SPRING_RABBITMQ_USERNAME`
-- `SPRING_RABBITMQ_PASSWORD`
-
-### PostgreSQL
-
-- `POSTGRES_DB`
-- `POSTGRES_USER`
-- `POSTGRES_PASSWORD`
-
-## Configuration
-
-### Database
-
-Current: `spring.jpa.hibernate.ddl-auto=create-drop`
-
-Database is deleted on every restart.
-
 

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * DTO for document processing messages received via RabbitMQ.
  * This message is sent when a document is uploaded and needs OCR processing.
  *
- * IMPORTANT: This class must match the DocumentMessage in PaperlessREST exactly!
+ * This class must match the DocumentMessage in PaperlessREST exactly
  */
 public class DocumentMessage {
 
