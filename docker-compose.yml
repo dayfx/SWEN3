@@ -20,8 +20,13 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paperless
       - SPRING_DATASOURCE_USERNAME=paperless
       - SPRING_DATASOURCE_PASSWORD=paperless
+      - SPRING_RABBITMQ_HOST=queue
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
     depends_on:
       - postgres
+      - queue
 
   web-ui:
     build: web-ui/
@@ -36,6 +41,20 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  paperless-services:
+    build:
+      context: .
+      dockerfile: PaperlessServices/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_RABBITMQ_HOST=queue
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    depends_on:
+      - queue
 
 volumes:
   postgres_data:
