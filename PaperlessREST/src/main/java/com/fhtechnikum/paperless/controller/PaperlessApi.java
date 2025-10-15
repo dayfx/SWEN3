@@ -6,6 +6,7 @@
 package com.fhtechnikum.paperless.controller;
 
 import com.fhtechnikum.paperless.services.dto.Document;
+import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-16T14:39:45.142619547Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-15T10:41:16.708431591Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
 @Validated
 @Tag(name = "paperless", description = "Paperless Document Management REST-API")
 public interface PaperlessApi {
@@ -41,49 +42,6 @@ public interface PaperlessApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
-
-    public static final String PATH_CREATE_DOCUMENT = "/api/documents";
-    /**
-     * POST /api/documents : Create a new document
-     *
-     * @param document  (required)
-     * @return Document successfully created. (status code 201)
-     *         or Document creation failed due to bad request! (status code 400)
-     */
-    @Operation(
-        operationId = "createDocument",
-        summary = "Create a new document",
-        tags = { "paperless" },
-        responses = {
-            @ApiResponse(responseCode = "201", description = "Document successfully created.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Document.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Document creation failed due to bad request!")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = PaperlessApi.PATH_CREATE_DOCUMENT,
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<Document> createDocument(
-        @Parameter(name = "Document", description = "", required = true) @Valid @RequestBody Document document
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"author\" : \"author\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
 
     public static final String PATH_DELETE_DOCUMENT = "/api/documents/{id}";
     /**
@@ -146,7 +104,7 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"author\" : \"author\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" }";
+                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -185,7 +143,7 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"author\" : \"author\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" }, { \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"author\" : \"author\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" } ]";
+                    String exampleString = "[ { \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }, { \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -230,7 +188,54 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"author\" : \"author\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" }";
+                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    public static final String PATH_UPLOAD_DOCUMENT = "/api/documents";
+    /**
+     * POST /api/documents : Upload a new document
+     *
+     * @param file The document file (PDF, DOCX, TXT, etc.) (required)
+     * @param title Optional document title (optional)
+     * @param author Optional document author (optional)
+     * @return Document successfully uploaded. (status code 201)
+     *         or Document upload failed due to bad request! (status code 400)
+     */
+    @Operation(
+        operationId = "uploadDocument",
+        summary = "Upload a new document",
+        tags = { "paperless" },
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Document successfully uploaded.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Document.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Document upload failed due to bad request!")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = PaperlessApi.PATH_UPLOAD_DOCUMENT,
+        produces = { "application/json" },
+        consumes = { "multipart/form-data" }
+    )
+    
+    default ResponseEntity<Document> uploadDocument(
+        @Parameter(name = "file", description = "The document file (PDF, DOCX, TXT, etc.)", required = true) @RequestPart(value = "file", required = true) MultipartFile file,
+        @Parameter(name = "title", description = "Optional document title") @Valid @RequestParam(value = "title", required = false) String title,
+        @Parameter(name = "author", description = "Optional document author") @Valid @RequestParam(value = "author", required = false) String author
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

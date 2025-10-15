@@ -23,7 +23,6 @@ public class SpringDocConfiguration {
                                 .contact(
                                         new Contact()
                                                 .name("SWEN3")
-                                                .url("https://www.technikum-wien.at")
                                 )
                                 .version("1.0.0")
                 )

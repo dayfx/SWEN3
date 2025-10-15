@@ -2,7 +2,6 @@ openapi: 3.1.0
 info:
   contact:
     name: SWEN3
-    url: https://www.technikum-wien.at
   description: DMS
   title: Paperless Document Management REST-Server
   version: 1.0.0
@@ -30,12 +29,12 @@ paths:
       x-tags:
       - tag: paperless
     post:
-      operationId: createDocument
+      operationId: uploadDocument
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: "#/components/schemas/document"
+              $ref: "#/components/schemas/uploadDocument_request"
         required: true
       responses:
         "201":
@@ -43,13 +42,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/document"
-          description: Document successfully created.
+          description: Document successfully uploaded.
         "400":
-          description: Document creation failed due to bad request!
-      summary: Create a new document
+          description: Document upload failed due to bad request!
+      summary: Upload a new document
       tags:
       - paperless
-      x-content-type: application/json
+      x-content-type: multipart/form-data
       x-accepts:
       - application/json
       x-tags:
@@ -147,10 +146,13 @@ components:
     document:
       example:
         uploadDate: 2000-01-23T04:56:07.000+00:00
+        fileSize: 6
         author: author
         id: 0
+        mimeType: mimeType
         title: title
         content: content
+        originalFilename: originalFilename
       properties:
         id:
           description: The unique id of the document
@@ -165,15 +167,37 @@ components:
         content:
           description: The content of the document
           type: string
+        originalFilename:
+          description: The original filename of the uploaded document
+          type: string
+        mimeType:
+          description: "The MIME type of the document (e.g., application/pdf)"
+          type: string
+        fileSize:
+          description: The size of the file in bytes
+          format: int64
+          type: integer
         uploadDate:
           description: When the document was uploaded
           format: date-time
           type: string
       required:
-      - author
-      - content
       - title
     documents:
       items:
         $ref: "#/components/schemas/document"
       type: array
+    uploadDocument_request:
+      properties:
+        file:
+          description: "The document file (PDF, DOCX, TXT, etc.)"
+          format: binary
+          type: string
+        title:
+          description: Optional document title
+          type: string
+        author:
+          description: Optional document author
+          type: string
+      required:
+      - file

@@ -23,16 +23,22 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("document")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-16T14:39:45.142619547Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-15T10:41:16.708431591Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
 public class Document {
 
   private @Nullable Long id;
 
   private String title;
 
-  private String author;
+  private @Nullable String author;
 
-  private String content;
+  private @Nullable String content;
+
+  private @Nullable String originalFilename;
+
+  private @Nullable String mimeType;
+
+  private @Nullable Long fileSize;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime uploadDate;
@@ -44,10 +50,8 @@ public class Document {
   /**
    * Constructor with only required parameters
    */
-  public Document(String title, String author, String content) {
+  public Document(String title) {
     this.title = title;
-    this.author = author;
-    this.content = content;
   }
 
   public Document id(@Nullable Long id) {
@@ -80,7 +84,6 @@ public class Document {
    * @return title
    */
   @NotNull 
-  @NotBlank(message = "Title cannot be empty")
   @Schema(name = "title", description = "The title of the document", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("title")
   public String getTitle() {
@@ -91,7 +94,7 @@ public class Document {
     this.title = title;
   }
 
-  public Document author(String author) {
+  public Document author(@Nullable String author) {
     this.author = author;
     return this;
   }
@@ -100,19 +103,18 @@ public class Document {
    * The author of the document
    * @return author
    */
-  @NotNull 
-  @NotBlank(message = "Author cannot be empty")
-  @Schema(name = "author", description = "The author of the document", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "author", description = "The author of the document", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("author")
-  public String getAuthor() {
+  public @Nullable String getAuthor() {
     return author;
   }
 
-  public void setAuthor(String author) {
+  public void setAuthor(@Nullable String author) {
     this.author = author;
   }
 
-  public Document content(String content) {
+  public Document content(@Nullable String content) {
     this.content = content;
     return this;
   }
@@ -121,16 +123,75 @@ public class Document {
    * The content of the document
    * @return content
    */
-  @NotNull 
-  @NotBlank(message = "Content cannot be empty")
-  @Schema(name = "content", description = "The content of the document", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "content", description = "The content of the document", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("content")
-  public String getContent() {
+  public @Nullable String getContent() {
     return content;
   }
 
-  public void setContent(String content) {
+  public void setContent(@Nullable String content) {
     this.content = content;
+  }
+
+  public Document originalFilename(@Nullable String originalFilename) {
+    this.originalFilename = originalFilename;
+    return this;
+  }
+
+  /**
+   * The original filename of the uploaded document
+   * @return originalFilename
+   */
+  
+  @Schema(name = "originalFilename", description = "The original filename of the uploaded document", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("originalFilename")
+  public @Nullable String getOriginalFilename() {
+    return originalFilename;
+  }
+
+  public void setOriginalFilename(@Nullable String originalFilename) {
+    this.originalFilename = originalFilename;
+  }
+
+  public Document mimeType(@Nullable String mimeType) {
+    this.mimeType = mimeType;
+    return this;
+  }
+
+  /**
+   * The MIME type of the document (e.g., application/pdf)
+   * @return mimeType
+   */
+  
+  @Schema(name = "mimeType", description = "The MIME type of the document (e.g., application/pdf)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("mimeType")
+  public @Nullable String getMimeType() {
+    return mimeType;
+  }
+
+  public void setMimeType(@Nullable String mimeType) {
+    this.mimeType = mimeType;
+  }
+
+  public Document fileSize(@Nullable Long fileSize) {
+    this.fileSize = fileSize;
+    return this;
+  }
+
+  /**
+   * The size of the file in bytes
+   * @return fileSize
+   */
+  
+  @Schema(name = "fileSize", description = "The size of the file in bytes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("fileSize")
+  public @Nullable Long getFileSize() {
+    return fileSize;
+  }
+
+  public void setFileSize(@Nullable Long fileSize) {
+    this.fileSize = fileSize;
   }
 
   public Document uploadDate(@Nullable OffsetDateTime uploadDate) {
@@ -166,12 +227,15 @@ public class Document {
         Objects.equals(this.title, document.title) &&
         Objects.equals(this.author, document.author) &&
         Objects.equals(this.content, document.content) &&
+        Objects.equals(this.originalFilename, document.originalFilename) &&
+        Objects.equals(this.mimeType, document.mimeType) &&
+        Objects.equals(this.fileSize, document.fileSize) &&
         Objects.equals(this.uploadDate, document.uploadDate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, author, content, uploadDate);
+    return Objects.hash(id, title, author, content, originalFilename, mimeType, fileSize, uploadDate);
   }
 
   @Override
@@ -182,6 +246,9 @@ public class Document {
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    author: ").append(toIndentedString(author)).append("\n");
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
+    sb.append("    originalFilename: ").append(toIndentedString(originalFilename)).append("\n");
+    sb.append("    mimeType: ").append(toIndentedString(mimeType)).append("\n");
+    sb.append("    fileSize: ").append(toIndentedString(fileSize)).append("\n");
     sb.append("    uploadDate: ").append(toIndentedString(uploadDate)).append("\n");
     sb.append("}");
     return sb.toString();
