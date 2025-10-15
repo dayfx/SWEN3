@@ -2,56 +2,54 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
     event.preventDefault();
 
     const title = document.getElementById('documentTitle').value;
-    const file = document.getElementById('fileInput').files[0];
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
 
     if (!file) {
-        document.getElementById('message').innerHTML =
-            '<div class="alert alert-danger" role="alert">Please select a file!</div>';
+        showMessage('Please select a file!', 'danger');
         return;
     }
 
+    // Validate file size (10MB max)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+        showMessage('File is too large! Maximum size is 10MB.', 'danger');
+        return;
+    }
+
+    // Create FormData object for multipart/form-data
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    // author is optional
+
     try {
-        // Read file content as text
-        const content = await readFileAsText(file);
-
-        fetch('/api/documents', {
+        const response = await fetch('/api/documents', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: title,
-                author: 'Uploaded User',
-                content: content
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    const messageDiv = document.getElementById('message');
-                    messageDiv.className = 'alert alert-success mt-3';
-                    messageDiv.textContent = 'Document successfully uploaded!';
-                    document.getElementById('uploadForm').reset();
-                } else {
-                    throw new Error('Upload failed!');
-                }
-            })
-            .catch(error => {
-                const messageDiv = document.getElementById('message');
-                messageDiv.className = 'alert alert-danger mt-3';
-                messageDiv.textContent = 'Document upload failed! ' + error.message;
-            });
+            body: formData
+        });
 
+        if (response.ok) {
+            const uploadedDoc = await response.json();
+            showMessage('Document successfully uploaded!', 'success');
+            console.log('Uploaded document:', uploadedDoc);
+
+            // Reset form after successful upload
+            document.getElementById('uploadForm').reset();
+        } else if (response.status === 400) {
+            showMessage('Upload failed! Please check your file type and size.', 'danger');
+        } else {
+            showMessage('Upload failed! Server error.', 'danger');
+        }
     } catch (error) {
-        document.getElementById('message').innerHTML =
-            '<div class="alert alert-danger" role="alert">Error reading file!</div>';
+        console.error('Upload error:', error);
+        showMessage('Upload failed! Network error.', 'danger');
     }
 });
 
-function readFileAsText(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject(e);
-        reader.readAsText(file);
-    });
+function showMessage(text, type) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.className = `alert alert-${type} mt-3`;
+    messageDiv.textContent = text;
+    messageDiv.style.display = 'block';
 }

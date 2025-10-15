@@ -12,16 +12,17 @@ import java.time.ZoneOffset;
 @Mapper(componentModel = "spring")
 public interface DocumentMapper {
 
-    // main mapping
-
+    // main mapping - Entity to DTO
+    @Mapping(target = "content", ignore = true)
     Document toDto(DocumentEntity entity);
 
+    // DTO to Entity (fileData will be set manually during upload)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uploadDate", ignore = true)
+    @Mapping(target = "fileData", ignore = true)
     DocumentEntity toEntity(Document dto);
 
-     // LocalDateTime to an OffsetDateTime stuff
-
+     // LocalDateTime to an OffsetDateTime
     default OffsetDateTime fromLocalDateTime(LocalDateTime localDateTime) {
         if (localDateTime == null) {
             return null;

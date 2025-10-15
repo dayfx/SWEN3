@@ -34,7 +34,6 @@ function loadDocumentsCards() {
                                 <h6 class="card-subtitle mb-2 text-muted">Uploaded: ${uploadDate}</h6>
                                 <p class="card-text small text-muted">ID: ${document.id}</p>
                                 
-                                <!-- mt-auto pushes the buttons to the bottom of the card -->
                                 <div class="mt-auto text-end">
                                     <button class="btn btn-primary btn-sm" onclick="viewDocument(${document.id})">View</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteDocument(${document.id})">Delete</button>
@@ -55,7 +54,21 @@ function viewDocument(id) {
         .then(doc => {
             document.getElementById('documentModalLabel').textContent = doc.title;
             document.getElementById('modalDocumentAuthor').textContent = doc.author || 'Unknown';
-            document.getElementById('modalDocumentContent').textContent = doc.content;
+
+            // Show file metadata
+            const uploadDate = doc.uploadDate ? new Date(doc.uploadDate * 1000).toLocaleString() : 'N/A';
+            const fileSize = doc.fileSize ? (doc.fileSize / 1024).toFixed(2) + ' KB' : 'N/A';
+
+            const metadata = `
+                <strong>Filename:</strong> ${doc.originalFilename || 'N/A'}<br>
+                <strong>File Type:</strong> ${doc.mimeType || 'N/A'}<br>
+                <strong>File Size:</strong> ${fileSize}<br>
+                <strong>Upload Date:</strong> ${uploadDate}<br>
+                <strong>Document ID:</strong> ${doc.id}<br>
+                <br>
+            `;
+
+            document.getElementById('modalDocumentContent').innerHTML = metadata;
 
             documentModal.show();
         })
@@ -86,7 +99,7 @@ function deleteDocument(id) {
             .then(response => {
                 if (response.ok) {
                     alert('Document deleted successfully');
-                    loadDocuments(); // Reload the list
+                    loadDocumentsCards(); // Reload the list
                 } else {
                     alert('Error deleting document');
                 }

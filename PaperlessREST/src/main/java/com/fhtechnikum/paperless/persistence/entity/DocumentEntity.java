@@ -16,11 +16,20 @@ public class DocumentEntity {
     @Column(nullable = false)
     private String originalFilename;
 
-    @Column(nullable = false)
     private String author;
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "mime_type")
+    private String mimeType;
+
+    @Column(name = "file_size")
+    private Long fileSize;
+
+    @Lob
+    @Column(name = "file_data")
+    private byte[] fileData;
 
     @Column(name = "upload_date")
     private LocalDateTime uploadDate;
@@ -84,5 +93,37 @@ public class DocumentEntity {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public String getOriginalFilename() {
+        return originalFilename;
+    }
+
+    public void setOriginalFilename(String originalFilename) {
+        this.originalFilename = originalFilename;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
     }
 }
