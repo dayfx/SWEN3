@@ -15,23 +15,36 @@ paths:
     post:
       tags:
         - paperless
-      summary: "Create a new document"
-      operationId: createDocument
+      summary: "Upload a new document"
+      operationId: uploadDocument
       requestBody:
         content:
-          "application/json":
+          "multipart/form-data":
             schema:
-              $ref: '#/components/schemas/document'
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "The document file (PDF, DOCX, TXT, etc.)"
+                title:
+                  type: string
+                  description: "Optional document title"
+                author:
+                  type: string
+                  description: "Optional document author"
+              required:
+                - file
         required: true
       responses:
         201:
-          description: "Document successfully created."
+          description: "Document successfully uploaded."
           content:
             "application/json":
               schema:
                 $ref: '#/components/schemas/document'
         400:
-          description: "Document creation failed due to bad request!"
+          description: "Document upload failed due to bad request!"
     get:
       tags:
         - paperless
@@ -133,14 +146,22 @@ components:
         content:
           type: string
           description: "The content of the document"
+        originalFilename:
+          type: string
+          description: "The original filename of the uploaded document"
+        mimeType:
+          type: string
+          description: "The MIME type of the document (e.g., application/pdf)"
+        fileSize:
+          type: integer
+          format: int64
+          description: "The size of the file in bytes"
         uploadDate:
           type: string
           format: date-time
           description: "When the document was uploaded"
       required:
         - title
-        - author
-        - content
 
     documents:
       type: array
