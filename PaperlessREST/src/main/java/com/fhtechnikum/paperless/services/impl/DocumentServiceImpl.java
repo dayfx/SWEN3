@@ -1,9 +1,7 @@
 package com.fhtechnikum.paperless.services.impl;
 
 import com.fhtechnikum.paperless.messaging.DocumentMessageProducer;
-import com.fhtechnikum.paperless.services.mapper.DocumentMapper;
 import com.fhtechnikum.paperless.services.DocumentService;
-import com.fhtechnikum.paperless.services.dto.Document;
 import com.fhtechnikum.paperless.persistence.entity.DocumentEntity;
 import com.fhtechnikum.paperless.persistence.repository.DocumentRepository;
 import org.slf4j.Logger;
@@ -17,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -34,34 +31,30 @@ public class DocumentServiceImpl implements DocumentService {
     );
 
     private final DocumentRepository documentRepository;
-    private final DocumentMapper documentMapper;
     private final DocumentMessageProducer messageProducer;
 
     // constructor injection for all dependencies
     public DocumentServiceImpl(DocumentRepository documentRepository,
-                              DocumentMapper documentMapper,
                               DocumentMessageProducer messageProducer) {
         this.documentRepository = documentRepository;
-        this.documentMapper = documentMapper;
         this.messageProducer = messageProducer;
     }
 
     @Override
-    public Document createDocument(Document document) {
-        // mapper to convert DTO to Entity
-        DocumentEntity entity = documentMapper.toEntity(document);
+    public DocumentEntity createDocument(DocumentEntity entity) {
+        // Set upload date (business logic)
         entity.setUploadDate(LocalDateTime.now());
         DocumentEntity saved = documentRepository.save(entity);
 
         // Send RabbitMQ message for OCR processing
         messageProducer.sendOcrMessage(saved.getId(), saved.getOriginalFilename());
 
-        // mapper to convert the saved Entity back to a DTO
-        return documentMapper.toDto(saved);
+        // Return entity
+        return saved;
     }
 
     @Override
-    public Document uploadDocument(MultipartFile file, String title, String author) throws IOException {
+    public DocumentEntity uploadDocument(MultipartFile file, String title, String author) throws IOException {
         log.info("Starting file upload - filename: {}, size: {} bytes", file.getOriginalFilename(), file.getSize());
 
         // 1. Validate file is not empty
@@ -105,32 +98,28 @@ public class DocumentServiceImpl implements DocumentService {
         // 7. Send RabbitMQ message for OCR processing
         messageProducer.sendOcrMessage(saved.getId(), saved.getOriginalFilename());
 
-        // 8. Return DTO
-        return documentMapper.toDto(saved);
+        // 8. Return entity (controller will handle DTO mapping)
+        return saved;
     }
 
     @Override
-    public List<Document> getAllDocuments() {
-        return documentRepository.findAll().stream()
-                .map(documentMapper::toDto)
-                .collect(Collectors.toList());
+    public List<DocumentEntity> getAllDocuments() {
+        return documentRepository.findAll();
     }
 
     @Override
-    public Optional<Document> getDocumentById(Long id) {
-        return documentRepository.findById(id)
-                .map(documentMapper::toDto);
+    public Optional<DocumentEntity> getDocumentById(Long id) {
+        return documentRepository.findById(id);
     }
 
     @Override
-    public Document updateDocument(Long id, Document document) {
+    public DocumentEntity updateDocument(Long id, String title, String author, String content) {
         return documentRepository.findById(id)
                 .map(existing -> {
-                    existing.setTitle(document.getTitle());
-                    existing.setAuthor(document.getAuthor());
-                    existing.setContent(document.getContent());
-                    DocumentEntity updated = documentRepository.save(existing);
-                    return documentMapper.toDto(updated); // Use the mapper
+                    existing.setTitle(title);
+                    existing.setAuthor(author);
+                    existing.setContent(content);
+                    return documentRepository.save(existing);
                 })
                 .orElse(null);
     }
