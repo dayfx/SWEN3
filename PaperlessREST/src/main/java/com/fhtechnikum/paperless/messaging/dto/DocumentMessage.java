@@ -12,6 +12,7 @@ public class DocumentMessage {
 
     private Long documentId;
     private String filename;
+    private String minioObjectKey;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
@@ -19,9 +20,10 @@ public class DocumentMessage {
     public DocumentMessage() {
     }
 
-    public DocumentMessage(Long documentId, String filename) {
+    public DocumentMessage(Long documentId, String filename, String minioObjectKey) {
         this.documentId = documentId;
         this.filename = filename;
+        this.minioObjectKey = minioObjectKey;
         this.timestamp = LocalDateTime.now();
     }
 
@@ -49,11 +51,20 @@ public class DocumentMessage {
         this.timestamp = timestamp;
     }
 
+    public String getMinioObjectKey() {
+        return minioObjectKey;
+    }
+
+    public void setMinioObjectKey(String minioObjectKey) {
+        this.minioObjectKey = minioObjectKey;
+    }
+
     @Override
     public String toString() {
         return "DocumentMessage{" +
                 "documentId=" + documentId +
                 ", filename='" + filename + '\'' +
+                ", minioObjectKey='" + minioObjectKey + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
     }

@@ -78,7 +78,7 @@ All environment variables are configured in the `.env` file. The project include
 
 Copy and modify if needed:
 ```bash
-cp .env.sample .env
+cp .env.example .env
 ```
 
 Default values from `.env.sample`:

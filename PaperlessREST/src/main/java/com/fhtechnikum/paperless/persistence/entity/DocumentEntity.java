@@ -16,6 +16,7 @@ public class DocumentEntity {
     @Column(nullable = false)
     private String originalFilename;
 
+    @Column(nullable = false)
     private String author;
 
     @Column(columnDefinition = "TEXT")
@@ -27,9 +28,8 @@ public class DocumentEntity {
     @Column(name = "file_size")
     private Long fileSize;
 
-    @Lob
-    @Column(name = "file_data")
-    private byte[] fileData;
+    @Column(name = "minio_object_key")
+    private String minioObjectKey;
 
     @Column(name = "upload_date")
     private LocalDateTime uploadDate;
@@ -119,11 +119,11 @@ public class DocumentEntity {
         this.fileSize = fileSize;
     }
 
-    public byte[] getFileData() {
-        return fileData;
+    public String getMinioObjectKey() {
+        return minioObjectKey;
     }
 
-    public void setFileData(byte[] fileData) {
-        this.fileData = fileData;
+    public void setMinioObjectKey(String minioObjectKey) {
+        this.minioObjectKey = minioObjectKey;
     }
 }
