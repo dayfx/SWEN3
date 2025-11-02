@@ -12,8 +12,7 @@ import java.time.ZoneOffset;
 @Mapper(componentModel = "spring")
 public interface DocumentMapper {
 
-    // main mapping - Entity to DTO
-    @Mapping(target = "content", ignore = true)
+    // main mapping - Entity to DTO (includes OCR content)
     Document toDto(DocumentEntity entity);
 
     // DTO to Entity (minioObjectKey will be set manually during upload)

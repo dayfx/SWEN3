@@ -26,11 +26,16 @@ function loadDocumentsCards() {
             data.forEach((document) => {
                 const uploadDate = document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : 'N/A';
 
+                // Check if OCR content is available
+                const ocrBadge = document.content
+                    ? '<span class="badge bg-success">OCR Complete</span>'
+                    : '<span class="badge bg-warning text-dark">Processing...</span>';
+
                 const cardHTML = `
                     <div class="col-sm-12 col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${document.title}</h5>
+                                <h5 class="card-title">${document.title} ${ocrBadge}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">Uploaded: ${uploadDate}</h6>
                                 <p class="card-text small text-muted">ID: ${document.id}</p>
                                 
@@ -65,10 +70,26 @@ function viewDocument(id) {
                 <strong>File Size:</strong> ${fileSize}<br>
                 <strong>Upload Date:</strong> ${uploadDate}<br>
                 <strong>Document ID:</strong> ${doc.id}<br>
-                <br>
             `;
 
-            document.getElementById('modalDocumentContent').innerHTML = metadata;
+            // Show OCR extracted content if available
+            let contentSection = '';
+            if (doc.content) {
+                contentSection = `
+                    <hr>
+                    <strong>OCR Extracted Content:</strong>
+                    <div class="mt-2 p-3 bg-white border rounded" style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; font-size: 0.9em;">${escapeHtml(doc.content)}</div>
+                `;
+            } else {
+                contentSection = `
+                    <hr>
+                    <div class="alert alert-info mt-2" role="alert">
+                        <i class="bi bi-hourglass-split"></i> OCR processing in progress or no text content available...
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalDocumentContent').innerHTML = metadata + contentSection;
 
             documentModal.show();
         })
@@ -78,18 +99,17 @@ function viewDocument(id) {
         });
 }
 
-/*
-function viewDocument(id) {
-    fetch(`/api/documents/${id}`)
-        .then(response => response.json())
-        .then(doc => {
-            alert(`Title: ${doc.title}\nAuthor: ${doc.author}\n\nContent:\n${doc.content}`);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error loading document');
-        });
-*/
+// Helper function to escape HTML to prevent XSS attacks
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
 
 function deleteDocument(id) {
     if (confirm('Are you sure you want to delete this document?')) {

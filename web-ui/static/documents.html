@@ -49,17 +49,20 @@
 
 <!--MODAL Target-->
 <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="documentModalLabel">Document Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Author:</strong> <span id="modalDocumentAuthor"></span></p>
-                <hr>
-                <p><strong>Document Information:</strong></p>
-                <div id="modalDocumentContent" class="p-3 bg-light rounded"></div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p><strong>Author:</strong> <span id="modalDocumentAuthor"></span></p>
+                        <hr>
+                        <div id="modalDocumentContent"></div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

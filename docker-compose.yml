@@ -82,6 +82,8 @@ services:
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - TESSDATA_PREFIX=${TESSDATA_PREFIX:-/usr/share/tessdata}
+      - TESSERACT_LANGUAGE=${TESSERACT_LANGUAGE:-eng}
     depends_on:
       - queue
       - minio
@@ -90,4 +92,3 @@ services:
 volumes:
   postgres_data:
   minio_data:
-
