@@ -49,11 +49,12 @@ SWEN3/
 
 | Service | Port | Description |
 |---------|------|-------------|
-| web-ui | 80 | Frontend |
+| web-ui | 80 | Frontend (nginx) |
 | paperless-rest | 8081 | REST API Backend |
-| paperless-services | 8082 | OCR Worker |
+| paperless-services | 8082 | OCR Worker (Tesseract) |
 | postgres | 5432 | PostgreSQL Database |
-| queue | 5672, 15672 | RabbitMQ |
+| queue | 5672, 15672 | RabbitMQ Message Broker |
+| minio | 9000, 9090 | MinIO Object Storage |
 
 ## Prerequisites
 
@@ -78,7 +79,7 @@ All environment variables are configured in the `.env` file. The project include
 
 Copy and modify if needed:
 ```bash
-cp .env.sample .env
+cp .env.example .env
 ```
 
 Default values from `.env.sample`:
@@ -145,5 +146,6 @@ After starting, the following URLs are available:
 - Frontend: http://localhost:80
 - REST API: http://localhost:8081
 - RabbitMQ Management: http://localhost:15672 (guest/guest)
+- MinIO Console: http://localhost:9090 (minioadmin/minioadmin)
 - PostgreSQL: localhost:5432 (paperless/paperless)
 

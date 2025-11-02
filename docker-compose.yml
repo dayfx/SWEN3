@@ -24,9 +24,14 @@ services:
       - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
       - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
       - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
+      - MINIO_URL=${MINIO_URL}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
     depends_on:
       - postgres
       - queue
+      - minio
 
   web-ui:
     build: web-ui/
@@ -42,6 +47,23 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"    # MinIO API
+      - "9090:9090"    # MinIO Console UI
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9090"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
   paperless-services:
     build:
       context: .
@@ -53,9 +75,20 @@ services:
       - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
       - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
       - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
+      - MINIO_URL=${MINIO_URL}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - TESSDATA_PREFIX=${TESSDATA_PREFIX:-/usr/share/tessdata}
+      - TESSERACT_LANGUAGE=${TESSERACT_LANGUAGE:-eng}
     depends_on:
       - queue
+      - minio
+      - postgres
 
 volumes:
   postgres_data:
-
+  minio_data:

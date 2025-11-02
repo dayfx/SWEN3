@@ -25,14 +25,16 @@ public class DocumentMessageProducer {
     /**
      * Send a message to the OCR queue for document processing.
      *
-     * @param documentId The ID of the uploaded document
-     * @param filename   The filename of the uploaded document
+     * @param documentId     The ID of the uploaded document
+     * @param filename       The filename of the uploaded document
+     * @param minioObjectKey The MinIO object key where the file is stored
      */
-    public void sendOcrMessage(Long documentId, String filename) {
-        DocumentMessage message = new DocumentMessage(documentId, filename);
+    public void sendOcrMessage(Long documentId, String filename, String minioObjectKey) {
+        DocumentMessage message = new DocumentMessage(documentId, filename, minioObjectKey);
 
         rabbitTemplate.convertAndSend(RabbitMQConfig.OCR_QUEUE_NAME, message);
 
-        log.info("Sent OCR message to queue for document ID: {} (filename: {})", documentId, filename);
+        log.info("Sent OCR message to queue for document ID: {} (filename: {}, minioKey: {})",
+                documentId, filename, minioObjectKey);
     }
 }

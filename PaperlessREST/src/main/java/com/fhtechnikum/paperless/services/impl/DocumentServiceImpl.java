@@ -2,6 +2,7 @@ package com.fhtechnikum.paperless.services.impl;
 
 import com.fhtechnikum.paperless.messaging.DocumentMessageProducer;
 import com.fhtechnikum.paperless.services.DocumentService;
+import com.fhtechnikum.paperless.services.FileStorage;
 import com.fhtechnikum.paperless.persistence.entity.DocumentEntity;
 import com.fhtechnikum.paperless.persistence.repository.DocumentRepository;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -32,12 +34,15 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final DocumentMessageProducer messageProducer;
+    private final FileStorage fileStorage;
 
     // constructor injection for all dependencies
     public DocumentServiceImpl(DocumentRepository documentRepository,
-                              DocumentMessageProducer messageProducer) {
+                              DocumentMessageProducer messageProducer,
+                              FileStorage fileStorage) {
         this.documentRepository = documentRepository;
         this.messageProducer = messageProducer;
+        this.fileStorage = fileStorage;
     }
 
     @Override
@@ -47,7 +52,8 @@ public class DocumentServiceImpl implements DocumentService {
         DocumentEntity saved = documentRepository.save(entity);
 
         // Send RabbitMQ message for OCR processing
-        messageProducer.sendOcrMessage(saved.getId(), saved.getOriginalFilename());
+        // Note: For non-upload creates, minioObjectKey might be null
+        messageProducer.sendOcrMessage(saved.getId(), saved.getOriginalFilename(), saved.getMinioObjectKey());
 
         // Return entity
         return saved;
@@ -81,24 +87,31 @@ public class DocumentServiceImpl implements DocumentService {
         long fileSize = file.getSize();
         byte[] fileData = file.getBytes();
 
-        // 5. Create entity
+        // 5. Generate unique object key for MinIO (UUID + filename)
+        String objectKey = UUID.randomUUID().toString() + "_" + originalFilename;
+
+        // 6. Upload file to MinIO
+        fileStorage.upload(objectKey, fileData);
+        log.info("File uploaded to MinIO with key: {}", objectKey);
+
+        // 7. Create entity with MinIO reference
         DocumentEntity entity = new DocumentEntity();
         entity.setTitle(title != null && !title.trim().isEmpty() ? title : originalFilename);
         entity.setAuthor(author != null && !author.trim().isEmpty() ? author : "Unknown");
         entity.setOriginalFilename(originalFilename);
         entity.setMimeType(mimeType);
         entity.setFileSize(fileSize);
-        entity.setFileData(fileData);
+        entity.setMinioObjectKey(objectKey);  // Store MinIO key instead of file data
         entity.setUploadDate(LocalDateTime.now());
 
-        // 6. Save to database
+        // 8. Save to database
         DocumentEntity saved = documentRepository.save(entity);
         log.info("Document saved successfully - ID: {}, filename: {}", saved.getId(), saved.getOriginalFilename());
 
-        // 7. Send RabbitMQ message for OCR processing
-        messageProducer.sendOcrMessage(saved.getId(), saved.getOriginalFilename());
+        // 9. Send RabbitMQ message for OCR processing with MinIO key
+        messageProducer.sendOcrMessage(saved.getId(), saved.getOriginalFilename(), saved.getMinioObjectKey());
 
-        // 8. Return entity (controller will handle DTO mapping)
+        // 10. Return entity (controller will handle DTO mapping)
         return saved;
     }
 
@@ -126,10 +139,34 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public boolean deleteDocument(Long id) {
-        if (documentRepository.existsById(id)) {
-            documentRepository.deleteById(id);
-            return true;
+        // First, retrieve the document to get MinIO key
+        Optional<DocumentEntity> documentOpt = documentRepository.findById(id);
+
+        if (documentOpt.isEmpty()) {
+            log.warn("Document with ID {} not found for deletion", id);
+            return false;
         }
-        return false;
+
+        DocumentEntity document = documentOpt.get();
+
+        // Delete from MinIO if the file exists
+        if (document.getMinioObjectKey() != null && !document.getMinioObjectKey().trim().isEmpty()) {
+            try {
+                fileStorage.delete(document.getMinioObjectKey());
+                log.info("Deleted file from MinIO for document ID {}: {}", id, document.getMinioObjectKey());
+            } catch (Exception e) {
+                log.error("Failed to delete file from MinIO for document ID {}: {}", id, e.getMessage(), e);
+                // Continue with database deletion even if MinIO deletion fails
+                // (file might already be deleted or MinIO might be temporarily unavailable)
+            }
+        } else {
+            log.warn("Document ID {} has no MinIO object key, skipping MinIO deletion", id);
+        }
+
+        // Delete from database
+        documentRepository.deleteById(id);
+        log.info("Deleted document from database: ID {}", id);
+
+        return true;
     }
 }

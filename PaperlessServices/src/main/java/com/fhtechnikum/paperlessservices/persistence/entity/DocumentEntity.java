@@ -1,11 +1,16 @@
-package com.fhtechnikum.paperless.persistence.entity;
+package com.fhtechnikum.paperlessservices.persistence.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity for documents (mirrors the entity in PaperlessREST)
+ * Used by OCR worker to update document content after processing
+ */
 @Entity
 @Table(name = "documents")
 public class DocumentEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,13 +19,10 @@ public class DocumentEntity {
     private String title;
 
     @Column(nullable = false)
-    private String originalFilename;
-
-    @Column(nullable = false)
     private String author;
 
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    @Column(name = "original_filename")
+    private String originalFilename;
 
     @Column(name = "mime_type")
     private String mimeType;
@@ -34,27 +36,14 @@ public class DocumentEntity {
     @Column(name = "upload_date")
     private LocalDateTime uploadDate;
 
-    // Default constructor
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    // Constructors
     public DocumentEntity() {
     }
 
-    // Constructor with required parameters
-    public DocumentEntity(String title, String author, String content) {
-        this.title = title;
-        this.author = author;
-        this.content = content;
-    }
-
-    // Full constructor
-    public DocumentEntity(Long id, String title, String author, String content, LocalDateTime uploadDate) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.content = content;
-        this.uploadDate = uploadDate;
-    }
-
-    // Getters and setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -77,22 +66,6 @@ public class DocumentEntity {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getUploadDate() {
-        return uploadDate;
-    }
-
-    public void setUploadDate(LocalDateTime uploadDate) {
-        this.uploadDate = uploadDate;
     }
 
     public String getOriginalFilename() {
@@ -126,4 +99,21 @@ public class DocumentEntity {
     public void setMinioObjectKey(String minioObjectKey) {
         this.minioObjectKey = minioObjectKey;
     }
+
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
+
