@@ -146,6 +146,9 @@ components:
         content:
           type: string
           description: "The content of the document"
+        summary:
+          type: string
+          description: "AI-generated summary of the document"
         originalFilename:
           type: string
           description: "The original filename of the uploaded document"
