@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-15T10:41:16.708431591Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-24T14:22:52.382450900Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
 @Validated
 @Tag(name = "paperless", description = "Paperless Document Management REST-API")
 public interface PaperlessApi {
@@ -104,7 +104,7 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
+                    String exampleString = "{ \"summary\" : \"summary\", \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -143,7 +143,7 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }, { \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" } ]";
+                    String exampleString = "[ { \"summary\" : \"summary\", \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }, { \"summary\" : \"summary\", \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -188,7 +188,7 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
+                    String exampleString = "{ \"summary\" : \"summary\", \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -235,7 +235,7 @@ public interface PaperlessApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
+                    String exampleString = "{ \"summary\" : \"summary\", \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

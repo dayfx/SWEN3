@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("document")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-15T10:41:16.708431591Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-24T14:22:52.382450900Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
 public class Document {
 
   private @Nullable Long id;
@@ -33,6 +33,8 @@ public class Document {
   private @Nullable String author;
 
   private @Nullable String content;
+
+  private @Nullable String summary;
 
   private @Nullable String originalFilename;
 
@@ -134,6 +136,26 @@ public class Document {
     this.content = content;
   }
 
+  public Document summary(@Nullable String summary) {
+    this.summary = summary;
+    return this;
+  }
+
+  /**
+   * AI-generated summary of the document
+   * @return summary
+   */
+  
+  @Schema(name = "summary", description = "AI-generated summary of the document", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("summary")
+  public @Nullable String getSummary() {
+    return summary;
+  }
+
+  public void setSummary(@Nullable String summary) {
+    this.summary = summary;
+  }
+
   public Document originalFilename(@Nullable String originalFilename) {
     this.originalFilename = originalFilename;
     return this;
@@ -227,6 +249,7 @@ public class Document {
         Objects.equals(this.title, document.title) &&
         Objects.equals(this.author, document.author) &&
         Objects.equals(this.content, document.content) &&
+        Objects.equals(this.summary, document.summary) &&
         Objects.equals(this.originalFilename, document.originalFilename) &&
         Objects.equals(this.mimeType, document.mimeType) &&
         Objects.equals(this.fileSize, document.fileSize) &&
@@ -235,7 +258,7 @@ public class Document {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, author, content, originalFilename, mimeType, fileSize, uploadDate);
+    return Objects.hash(id, title, author, content, summary, originalFilename, mimeType, fileSize, uploadDate);
   }
 
   @Override
@@ -246,6 +269,7 @@ public class Document {
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    author: ").append(toIndentedString(author)).append("\n");
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
+    sb.append("    summary: ").append(toIndentedString(summary)).append("\n");
     sb.append("    originalFilename: ").append(toIndentedString(originalFilename)).append("\n");
     sb.append("    mimeType: ").append(toIndentedString(mimeType)).append("\n");
     sb.append("    fileSize: ").append(toIndentedString(fileSize)).append("\n");
