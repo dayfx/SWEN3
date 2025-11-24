@@ -5,6 +5,6 @@ WORKDIR $HOME
 ADD .. $HOME
 RUN mvn package -DskipTests
 
-FROM openjdk:21
+FROM eclipse-temurin:21-jre
 COPY --from=build /usr/app/PaperlessREST/target/*.jar /app/runner.jar
 ENTRYPOINT ["java", "-jar", "/app/runner.jar"]

@@ -38,8 +38,16 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
             document.getElementById('uploadForm').reset();
         } else if (response.status === 400) {
             showMessage('Upload failed! Please check your file type and size.', 'danger');
+        } else if (response.status === 413) {
+            showMessage('Upload failed! File is too large. The server limit is 10MB.', 'danger');
         } else {
-            showMessage('Upload failed! Server error.', 'danger');
+            // Try to get error message from server
+            try {
+                const errorData = await response.text();
+                showMessage(`Upload failed! Server error (${response.status}): ${errorData}`, 'danger');
+            } catch {
+                showMessage(`Upload failed! Server error (${response.status}).`, 'danger');
+            }
         }
     } catch (error) {
         console.error('Upload error:', error);

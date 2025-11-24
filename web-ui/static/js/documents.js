@@ -72,6 +72,16 @@ function viewDocument(id) {
                 <strong>Document ID:</strong> ${doc.id}<br>
             `;
 
+            // Show AI-generated summary if available
+            let summarySection = '';
+            if (doc.summary) {
+                summarySection = `
+                    <hr>
+                    <strong>AI Summary:</strong>
+                    <div class="mt-2 p-3 bg-light border rounded" style="font-size: 0.95em;">${escapeHtml(doc.summary)}</div>
+                `;
+            }
+
             // Show OCR extracted content if available
             let contentSection = '';
             if (doc.content) {
@@ -89,7 +99,7 @@ function viewDocument(id) {
                 `;
             }
 
-            document.getElementById('modalDocumentContent').innerHTML = metadata + contentSection;
+            document.getElementById('modalDocumentContent').innerHTML = metadata + summarySection + contentSection;
 
             documentModal.show();
         })
