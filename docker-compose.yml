@@ -84,6 +84,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - TESSDATA_PREFIX=${TESSDATA_PREFIX:-/usr/share/tessdata}
       - TESSERACT_LANGUAGE=${TESSERACT_LANGUAGE:-eng}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - queue
       - minio

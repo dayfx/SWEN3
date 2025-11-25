@@ -88,7 +88,6 @@ ehthumbs.db
 Desktop.ini
 
 # Docker
-# Keep docker-compose files but ignore environment-specific ones
 docker-compose.override.yml
 .env
 
@@ -113,7 +112,7 @@ application-prod.properties
 coverage/
 *.lcov
 
-# Node modules (if you have any frontend)
+# Node modules
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -128,10 +127,10 @@ yarn-error.log*
 application.log
 spring.log
 
-# MinIO data (if storing locally)
+# MinIO data
 minio-data/
 
-# PostgreSQL data (if storing locally) 
+# PostgreSQL data
 postgres-data/
 
 # Generated documentation

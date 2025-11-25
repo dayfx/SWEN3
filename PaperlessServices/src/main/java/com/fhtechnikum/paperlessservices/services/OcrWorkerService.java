@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * OCR Worker Service that consumes document processing messages from RabbitMQ.
- *
- * Sprint 4: Performs actual OCR processing using Tesseract and updates the database.
  */
 @Component
 public class OcrWorkerService {
@@ -21,13 +19,16 @@ public class OcrWorkerService {
 
     private final MinIOService minioService;
     private final TesseractOcrService ocrService;
+    private final GenAIService genAIService;
     private final DocumentRepository documentRepository;
 
     public OcrWorkerService(MinIOService minioService,
                            TesseractOcrService ocrService,
+                           GenAIService genAIService,
                            DocumentRepository documentRepository) {
         this.minioService = minioService;
         this.ocrService = ocrService;
+        this.genAIService = genAIService;
         this.documentRepository = documentRepository;
     }
 
@@ -65,10 +66,27 @@ public class OcrWorkerService {
 
             // 4. Update document with extracted text
             document.setContent(extractedText);
-            documentRepository.save(document);
-            log.info("Document content updated in database");
 
-            log.info("=== OCR Processing Complete ===");
+            // 5. Generate AI summary (Sprint 5)
+            if (extractedText != null && !extractedText.trim().isEmpty()) {
+                try {
+                    log.info("=== GenAI Processing Started ===");
+                    String summary = genAIService.generateSummary(extractedText);
+                    document.setSummary(summary);
+                    log.info("=== GenAI Processing Complete ===");
+                } catch (Exception genAIError) {
+                    log.error("GenAI processing failed: {}", genAIError.getMessage(), genAIError);
+                    document.setSummary("[AI Summary Failed: " + genAIError.getMessage() + "]");
+                }
+            } else {
+                log.warn("Skipping GenAI processing - no OCR text extracted");
+            }
+
+            // 6. Save document with content and summary
+            documentRepository.save(document);
+            log.info("Document content and summary updated in database");
+
+            log.info("=== Document Processing Complete ===");
             log.info("Document ID: {}", document.getId());
             log.info("Text Preview: {}", extractedText.length() > 100
                     ? extractedText.substring(0, 100) + "..."

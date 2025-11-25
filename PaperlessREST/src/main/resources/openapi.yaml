@@ -145,6 +145,7 @@ components:
   schemas:
     document:
       example:
+        summary: summary
         uploadDate: 2000-01-23T04:56:07.000+00:00
         fileSize: 6
         author: author
@@ -166,6 +167,9 @@ components:
           type: string
         content:
           description: The content of the document
+          type: string
+        summary:
+          description: AI-generated summary of the document
           type: string
         originalFilename:
           description: The original filename of the uploaded document

@@ -22,6 +22,9 @@ public class DocumentEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(columnDefinition = "TEXT")
+    private String summary;
+
     @Column(name = "mime_type")
     private String mimeType;
 
@@ -85,6 +88,14 @@ public class DocumentEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public LocalDateTime getUploadDate() {
