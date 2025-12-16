@@ -14,7 +14,6 @@ services:
     build:
       context: .
       dockerfile: PaperlessREST/Dockerfile
-    restart: always
     ports:
       - "8081:8081"
     environment:
@@ -69,7 +68,6 @@ services:
     build:
       context: .
       dockerfile: PaperlessServices/Dockerfile
-    restart: always
     ports:
       - "8082:8082"
     environment:
@@ -87,10 +85,6 @@ services:
       - TESSDATA_PREFIX=${TESSDATA_PREFIX:-/usr/share/tessdata}
       - TESSERACT_LANGUAGE=${TESSERACT_LANGUAGE:-eng}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paperless
-      - SPRING_DATASOURCE_USERNAME=paperless
-      - SPRING_DATASOURCE_PASSWORD=paperless
-      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
     depends_on:
       - queue
       - minio
