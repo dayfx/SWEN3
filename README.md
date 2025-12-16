@@ -147,5 +147,6 @@ After starting, the following URLs are available:
 - REST API: http://localhost:8081
 - RabbitMQ Management: http://localhost:15672 (guest/guest)
 - MinIO Console: http://localhost:9090 (minioadmin/minioadmin)
-- PostgreSQL: localhost:5432 (paperless/paperless)
+- PostgreSQL: http://localhost:5432 (paperless/paperless)
+- ElasticSearch: http://localhost:9200
 
