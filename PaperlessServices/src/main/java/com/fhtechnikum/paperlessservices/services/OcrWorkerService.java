@@ -3,6 +3,8 @@ package com.fhtechnikum.paperlessservices.services;
 import com.fhtechnikum.paperlessservices.messaging.dto.DocumentMessage;
 import com.fhtechnikum.paperlessservices.persistence.entity.DocumentEntity;
 import com.fhtechnikum.paperlessservices.persistence.repository.DocumentRepository;
+import com.fhtechnikum.paperlessservices.persistence.entity.ElasticSearchDocument;
+import com.fhtechnikum.paperlessservices.persistence.repository.ElasticSearchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,15 +23,18 @@ public class OcrWorkerService {
     private final TesseractOcrService ocrService;
     private final GenAIService genAIService;
     private final DocumentRepository documentRepository;
+    private final ElasticSearchRepository elasticSearchRepository;
 
     public OcrWorkerService(MinIOService minioService,
-                           TesseractOcrService ocrService,
-                           GenAIService genAIService,
-                           DocumentRepository documentRepository) {
+                            TesseractOcrService ocrService,
+                            GenAIService genAIService,
+                            DocumentRepository documentRepository,
+                            ElasticSearchRepository elasticSearchRepository) {
         this.minioService = minioService;
         this.ocrService = ocrService;
         this.genAIService = genAIService;
         this.documentRepository = documentRepository;
+        this.elasticSearchRepository = elasticSearchRepository;
     }
 
     /**
@@ -85,6 +90,14 @@ public class OcrWorkerService {
             // 6. Save document with content and summary
             documentRepository.save(document);
             log.info("Document content and summary updated in database");
+
+            // 7. Index to Elasticsearch (Sprint 6)
+            if (extractedText != null && !extractedText.isEmpty()) {
+                log.info("Indexing document {} to Elasticsearch...", document.getId());
+                ElasticSearchDocument esDoc = new ElasticSearchDocument(document.getId(), extractedText);
+                elasticSearchRepository.save(esDoc);
+                log.info("Successfully indexed document ID: {}", document.getId());
+            }
 
             log.info("=== Document Processing Complete ===");
             log.info("Document ID: {}", document.getId());
