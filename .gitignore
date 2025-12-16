@@ -89,7 +89,7 @@ Desktop.ini
 
 # Docker
 docker-compose.override.yml
-.env
+.env.sample
 
 # Database
 *.db
@@ -139,5 +139,5 @@ docs/generated/
 # Backup files
 *.backup
 *.bak
-.env
+.env.sample
 /docs/
