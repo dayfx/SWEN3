@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("document")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-24T14:22:52.382450900Z[Etc/UTC]", comments = "Generator version: 7.16.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-07T17:31:27.030566015Z[Etc/UTC]", comments = "Generator version: 7.19.0-SNAPSHOT")
 public class Document {
 
   private @Nullable Long id;

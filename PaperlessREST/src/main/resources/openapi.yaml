@@ -141,6 +141,34 @@ paths:
       - application/json
       x-tags:
       - tag: paperless
+  /api/documents/search:
+    get:
+      operationId: searchDocuments
+      parameters:
+      - description: The search query to match against document content
+        explode: true
+        in: query
+        name: query
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/documents"
+          description: Success
+        "400":
+          description: Invalid search query
+      summary: Search for documents by content
+      tags:
+      - paperless
+      x-accepts:
+      - application/json
+      x-tags:
+      - tag: paperless
 components:
   schemas:
     document:

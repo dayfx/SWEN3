@@ -132,4 +132,34 @@ public class PaperlessApiControllerImpl implements PaperlessApi {
             return ResponseEntity.status(503).build(); // Service Unavailable
         }
     }
+
+    @Override
+    public ResponseEntity<List<Document>> searchDocuments(String query) {
+        try {
+            log.info("Received search request - query: {}", query);
+
+            // Validate query
+            if (query == null || query.trim().isEmpty()) {
+                log.error("Search failed: empty query");
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Service returns entities
+            List<DocumentEntity> entities = documentService.searchDocuments(query);
+
+            // Controller handles DTO mapping
+            List<Document> documents = entities.stream()
+                    .map(documentMapper::toDto)
+                    .collect(Collectors.toList());
+
+            log.info("Search completed - found {} documents", documents.size());
+            return ResponseEntity.ok(documents);
+        } catch (DataAccessException e) {
+            log.error("Database error during search: {}", e.getMessage(), e);
+            return ResponseEntity.status(503).build(); // Service Unavailable
+        } catch (Exception e) {
+            log.error("Elasticsearch error during search: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).build(); // Internal Server Error
+        }
+    }
 }

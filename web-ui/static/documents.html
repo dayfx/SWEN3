@@ -42,6 +42,20 @@
         </div>
     </div>
 
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search documents...">
+                <button class="btn btn-primary px-4 fw-bold" type="button" onclick="searchDocuments()">
+                    Search
+                </button>
+                <button class="btn btn-secondary" type="button" onclick="clearSearch()" id="clearSearchBtn" style="display: none;">Clear</button>
+            </div>
+            <div id="searchInfo" class="text-muted small mt-2" style="display: none;"></div>
+        </div>
+    </div>
+
     <div class="row g-4" id="documentCardsContainer">
         <!-- Document cards will be injected here by document.js -->
     </div>

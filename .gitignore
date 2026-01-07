@@ -141,3 +141,4 @@ docs/generated/
 *.bak
 .env.sample
 /docs/
+.env

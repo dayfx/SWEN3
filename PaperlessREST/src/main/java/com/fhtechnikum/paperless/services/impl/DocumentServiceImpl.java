@@ -3,8 +3,10 @@ package com.fhtechnikum.paperless.services.impl;
 import com.fhtechnikum.paperless.messaging.DocumentMessageProducer;
 import com.fhtechnikum.paperless.services.DocumentService;
 import com.fhtechnikum.paperless.services.FileStorage;
+import com.fhtechnikum.paperless.persistence.entity.ElasticSearchDocument;
 import com.fhtechnikum.paperless.persistence.entity.DocumentEntity;
 import com.fhtechnikum.paperless.persistence.repository.DocumentRepository;
+import com.fhtechnikum.paperless.persistence.repository.ElasticSearchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,14 +37,17 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentMessageProducer messageProducer;
     private final FileStorage fileStorage;
+    private final ElasticSearchRepository elasticSearchRepository;
 
     // constructor injection for all dependencies
     public DocumentServiceImpl(DocumentRepository documentRepository,
                               DocumentMessageProducer messageProducer,
-                              FileStorage fileStorage) {
+                              FileStorage fileStorage,
+                              ElasticSearchRepository elasticSearchRepository) {
         this.documentRepository = documentRepository;
         this.messageProducer = messageProducer;
         this.fileStorage = fileStorage;
+        this.elasticSearchRepository = elasticSearchRepository;
     }
 
     @Override
@@ -168,5 +173,30 @@ public class DocumentServiceImpl implements DocumentService {
         log.info("Deleted document from database: ID {}", id);
 
         return true;
+    }
+
+    public List<DocumentEntity> searchDocuments(String query) {
+        log.info("Searching documents with query: {}", query);
+
+        try {
+            // Search in Elasticsearch using full-text search (supports multi-word queries)
+            List<ElasticSearchDocument> searchResults = elasticSearchRepository.searchByContent(query);
+
+            // Extract document IDs
+            List<Long> documentIds = searchResults.stream()
+                    .map(ElasticSearchDocument::getId)
+                    .toList();
+
+            // Fetch full documents from PostgreSQL
+            List<DocumentEntity> documents = documentRepository.findAllById(documentIds);
+
+            log.info("Found {} documents matching query: {}", documents.size(), query);
+            return documents;
+        } catch (Exception e) {
+            log.error("Elasticsearch search failed for query '{}': {}", query, e.getMessage(), e);
+            // Return empty list instead of throwing - graceful degradation
+            log.warn("Returning empty results due to search error");
+            return List.of();
+        }
     }
 }
