@@ -28,10 +28,17 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - SPRING_ELASTICSEARCH_URIS=${SPRING_ELASTICSEARCH_URIS}
     depends_on:
-      - postgres
-      - queue
-      - minio
+      elasticsearch:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+      queue:
+        condition: service_started
+      minio:
+        condition: service_started
+
 
   web-ui:
     build: web-ui/
@@ -85,10 +92,17 @@ services:
       - TESSDATA_PREFIX=${TESSDATA_PREFIX:-/usr/share/tessdata}
       - TESSERACT_LANGUAGE=${TESSERACT_LANGUAGE:-eng}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SPRING_ELASTICSEARCH_URIS=${SPRING_ELASTICSEARCH_URIS}
     depends_on:
-      - queue
-      - minio
-      - postgres
+      elasticsearch:
+        condition: service_healthy
+      queue:
+        condition: service_started
+      minio:
+        condition: service_started
+      postgres:
+        condition: service_started
+
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
@@ -101,6 +115,12 @@ services:
       - "9200:9200"
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
 
   kibana:
       image: docker.elastic.co/kibana/kibana:8.10.2

@@ -1,54 +1,25 @@
 // Auto-load documents when page loads
-document.addEventListener('DOMContentLoaded', loadDocumentsCards);
+document.addEventListener('DOMContentLoaded', function() {
+    loadDocumentsCards();
+
+    document.getElementById('searchInput').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            searchDocuments();
+        }
+    });
+});
+
 // Modal instance
 const documentModal = new bootstrap.Modal(document.getElementById('documentModal'));
+
+let isSearchMode = false;
 
 function loadDocumentsCards() {
     fetch('/api/documents')
         .then(response => response.json())
         .then(data => {
-            const cardsContainer = document.getElementById('documentCardsContainer');
-            cardsContainer.innerHTML = '';
-
-            if (data.length === 0) {
-                const message = `
-                    <div class="col-12">
-                        <div class="text-center p-5 bg-light rounded">
-                            <h4>No documents found.</h4>
-                            <p>Why not <a href="/upload.html">upload</a> one?</p>
-                        </div>
-                    </div>
-                `;
-                cardsContainer.innerHTML = message;
-                return;
-            }
-
-            data.forEach((document) => {
-                const uploadDate = document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : 'N/A';
-
-                // Check if OCR content is available
-                const ocrBadge = document.content
-                    ? '<span class="badge bg-success">OCR Complete</span>'
-                    : '<span class="badge bg-warning text-dark">Processing...</span>';
-
-                const cardHTML = `
-                    <div class="col-sm-12 col-md-6 col-lg-4">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${document.title} ${ocrBadge}</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">Uploaded: ${uploadDate}</h6>
-                                <p class="card-text small text-muted">ID: ${document.id}</p>
-                                
-                                <div class="mt-auto text-end">
-                                    <button class="btn btn-primary btn-sm" onclick="viewDocument(${document.id})">View</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteDocument(${document.id})">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                cardsContainer.insertAdjacentHTML('beforeend', cardHTML);
-            });
+            isSearchMode = false;
+            displayDocuments(data);
         })
         .catch(error => console.error('Error fetching documents:', error));
 }
@@ -61,7 +32,14 @@ function viewDocument(id) {
             document.getElementById('modalDocumentAuthor').textContent = doc.author || 'Unknown';
 
             // Show file metadata
-            const uploadDate = doc.uploadDate ? new Date(doc.uploadDate * 1000).toLocaleString() : 'N/A';
+            let uploadDate = 'N/A';
+            if (doc.uploadDate) {
+                if (typeof doc.uploadDate === 'string') {
+                    uploadDate = new Date(doc.uploadDate).toLocaleString();
+                } else if (typeof doc.uploadDate === 'number') {
+                    uploadDate = new Date(doc.uploadDate * 1000).toLocaleString();
+                }
+            }
             const fileSize = doc.fileSize ? (doc.fileSize / 1024).toFixed(2) + ' KB' : 'N/A';
 
             const metadata = `
@@ -109,7 +87,6 @@ function viewDocument(id) {
         });
 }
 
-// Helper function to escape HTML to prevent XSS attacks
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -129,7 +106,12 @@ function deleteDocument(id) {
             .then(response => {
                 if (response.ok) {
                     alert('Document deleted successfully');
-                    loadDocumentsCards(); // Reload the list
+                    // Reload based on current mode
+                    if (isSearchMode) {
+                        searchDocuments();
+                    } else {
+                        loadDocumentsCards();
+                    }
                 } else {
                     alert('Error deleting document');
                 }
@@ -139,4 +121,110 @@ function deleteDocument(id) {
                 alert('Error deleting document');
             });
     }
+}
+
+// Search documents by content
+function searchDocuments() {
+    const query = document.getElementById('searchInput').value.trim();
+
+    if (!query) {
+        alert('Please enter a search query');
+        return;
+    }
+
+    console.log('Searching for:', query);
+
+    fetch(`/api/documents/search?query=${encodeURIComponent(query)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Search failed: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            isSearchMode = true;
+            displayDocuments(data, query);
+
+            // Show clear button + search info
+            document.getElementById('clearSearchBtn').style.display = 'inline-block';
+            const searchInfo = document.getElementById('searchInfo');
+            searchInfo.textContent = `Found ${data.length} document(s) matching "${query}"`;
+            searchInfo.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error searching documents:', error);
+            alert('Error searching documents. Please try again.');
+        });
+}
+
+// Clear search and show all documents
+function clearSearch() {
+    isSearchMode = false;
+    document.getElementById('searchInput').value = '';
+    document.getElementById('clearSearchBtn').style.display = 'none';
+    document.getElementById('searchInfo').style.display = 'none';
+    loadDocumentsCards();
+}
+
+// Helper function to display documents
+function displayDocuments(data, searchQuery = null) {
+    const cardsContainer = document.getElementById('documentCardsContainer');
+    cardsContainer.innerHTML = '';
+
+    if (data.length === 0) {
+        const message = searchQuery
+            ? `
+                <div class="col-12">
+                    <div class="text-center p-5 bg-light rounded">
+                        <h4>No documents found matching "${searchQuery}"</h4>
+                        <p>Try a different search term or <button class="btn btn-link p-0" onclick="clearSearch()">view all documents</button></p>
+                    </div>
+                </div>
+            `
+            : `
+                <div class="col-12">
+                    <div class="text-center p-5 bg-light rounded">
+                        <h4>No documents found.</h4>
+                        <p>Why not <a href="/upload.html">upload</a> one?</p>
+                    </div>
+                </div>
+            `;
+        cardsContainer.innerHTML = message;
+        return;
+    }
+
+    data.forEach((document) => {
+        // Handle uploadDate
+        let uploadDate = 'N/A';
+        if (document.uploadDate) {
+            if (typeof document.uploadDate === 'string') {
+                uploadDate = new Date(document.uploadDate).toLocaleDateString();
+            } else if (typeof document.uploadDate === 'number') {
+                uploadDate = new Date(document.uploadDate * 1000).toLocaleDateString();
+            }
+        }
+
+        // Check if OCR content is available
+        const ocrBadge = document.content
+            ? '<span class="badge bg-success">OCR Complete</span>'
+            : '<span class="badge bg-warning text-dark">Processing...</span>';
+
+        const cardHTML = `
+            <div class="col-sm-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${document.title} ${ocrBadge}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Uploaded: ${uploadDate}</h6>
+                        <p class="card-text small text-muted">ID: ${document.id}</p>
+
+                        <div class="mt-auto text-end">
+                            <button class="btn btn-primary btn-sm" onclick="viewDocument(${document.id})">View</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteDocument(${document.id})">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        cardsContainer.insertAdjacentHTML('beforeend', cardHTML);
+    });
 }

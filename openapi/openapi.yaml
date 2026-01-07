@@ -128,6 +128,29 @@ paths:
         404:
           description: "Document does not exist with this id!"
 
+  /api/documents/search:
+    get:
+      tags:
+        - paperless
+      summary: "Search for documents by content"
+      operationId: searchDocuments
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "The search query to match against document content"
+      responses:
+        200:
+          description: "Success"
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/documents'
+        400:
+          description: "Invalid search query"
+
 components:
   schemas:
     document:

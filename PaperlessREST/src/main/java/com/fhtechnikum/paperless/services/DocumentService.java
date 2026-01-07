@@ -20,5 +20,6 @@ public interface DocumentService {
     Optional<DocumentEntity> getDocumentById(Long id);
     DocumentEntity updateDocument(Long id, String title, String author, String content);
     boolean deleteDocument(Long id);
+    List<DocumentEntity> searchDocuments(String query);
 }
 
