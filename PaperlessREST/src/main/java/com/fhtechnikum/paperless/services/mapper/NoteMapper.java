@@ -1,7 +1,7 @@
 package com.fhtechnikum.paperless.services.mapper;
 
-import com.fhtechnikum.paperless.services.dto.Document;
-import com.fhtechnikum.paperless.persistence.entity.DocumentEntity;
+import com.fhtechnikum.paperless.services.dto.Note;
+import com.fhtechnikum.paperless.persistence.entity.NoteEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -10,19 +10,17 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 @Mapper(componentModel = "spring")
-public interface DocumentMapper {
+public interface NoteMapper {
 
-    // Entity to DTO
-    Document toDto(DocumentEntity entity);
+    @Mapping(source = "document.id", target = "documentId")
+    Note toDto(NoteEntity entity);
 
-    // DTO to Entity
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "uploadDate", ignore = true)
-    @Mapping(target = "minioObjectKey", ignore = true)
-    @Mapping(target = "notes", ignore = true)
-    DocumentEntity toEntity(Document dto);
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "document", ignore = true)
+    NoteEntity toEntity(Note dto);
 
-     // LocalDateTime to an OffsetDateTime
+    // LocalDateTime to OffsetDateTime
     default OffsetDateTime fromLocalDateTime(LocalDateTime localDateTime) {
         if (localDateTime == null) {
             return null;
