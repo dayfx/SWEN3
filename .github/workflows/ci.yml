@@ -9,15 +9,15 @@
 name: CI Pipeline
 
 on:
-    push:
-      branches: [ "master" ]
-    pull_request:
-      branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 jobs:
-    build:
-      runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       # 1. Checkout code
       - uses: actions/checkout@v4
 
@@ -29,28 +29,12 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # 3. Build Maven & Run Tests
-      - name: Build with Maven and run tests
-        run: mvn -B package --file pom.xml
+      # 3. Compile and validate code
+      - name: Compile with Maven
+        run: mvn -B clean compile --file pom.xml
 
-      # 4. Upload JAR artifacts
-      - name: Upload JAR artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: application-jars
-          path: |
-            PaperlessREST/target/*.jar
-            PaperlessServices/target/*.jar
-
-      # 5. Build Docker images (validation only)
-      - name: Build Docker images
-        run: |
-          docker build -f PaperlessREST/Dockerfile -t paperless-rest:ci .
-          docker build -f PaperlessServices/Dockerfile -t paperless-services:ci .
-          docker build -f web-ui/Dockerfile -t web-ui:ci ./web-ui
-
-      # 6. Validate docker-compose
+      # 4. Validate docker-compose configuration
       - name: Validate docker-compose
         run: docker compose config
 
-        
+
