@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ElasticSearchRepository extends ElasticsearchRepository<ElasticSearchDocument, Long> {
-    // Use Elasticsearch match query for proper full-text search with multi-word support
-    @Query("{\"match\": {\"content\": {\"query\": \"?0\", \"operator\": \"and\"}}}")
+    // Use Elasticsearch multi_match query to search both content and notes fields
+    @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": [\"content\", \"notes\"], \"operator\": \"and\"}}")
     List<ElasticSearchDocument> searchByContent(String query);
 }

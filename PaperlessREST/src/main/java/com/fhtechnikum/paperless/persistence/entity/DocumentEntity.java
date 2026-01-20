@@ -2,6 +2,8 @@ package com.fhtechnikum.paperless.persistence.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "documents")
@@ -36,6 +38,9 @@ public class DocumentEntity {
 
     @Column(name = "upload_date")
     private LocalDateTime uploadDate;
+
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NoteEntity> notes = new ArrayList<>();
 
     // Default constructor
     public DocumentEntity() {
@@ -136,5 +141,23 @@ public class DocumentEntity {
 
     public void setMinioObjectKey(String minioObjectKey) {
         this.minioObjectKey = minioObjectKey;
+    }
+
+    public List<NoteEntity> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<NoteEntity> notes) {
+        this.notes = notes;
+    }
+
+    public void addNote(NoteEntity note) {
+        notes.add(note);
+        note.setDocument(this);
+    }
+
+    public void removeNote(NoteEntity note) {
+        notes.remove(note);
+        note.setDocument(null);
     }
 }
