@@ -1,5 +1,6 @@
 package com.fhtechnikum.paperless.integration;
 
+import com.fhtechnikum.paperless.messaging.DocumentMessageProducer;
 import com.fhtechnikum.paperless.persistence.entity.DocumentEntity;
 import com.fhtechnikum.paperless.persistence.repository.DocumentRepository;
 import com.fhtechnikum.paperless.persistence.repository.ElasticSearchRepository;
@@ -47,6 +48,9 @@ class DocumentIntegrationTest {
 
     @MockitoBean
     private ElasticSearchRepository elasticSearchRepository;
+
+    @MockitoBean
+    private DocumentMessageProducer documentMessageProducer;
 
     @BeforeEach
     void setUp() {
