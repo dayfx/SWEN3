@@ -9,39 +9,34 @@
 ```
 SWEN3/
 ├── openapi/
-│   ├── openapi.yaml              # API Specification
-│   └── openapi-gen.sh            # Code Generation
+│   └── openapi.yaml              # API Specification
 │
 ├── PaperlessREST/                # REST API (Port 8081)
 │   ├── src/main/java/com/fhtechnikum/paperless/
-│   │   ├── controller/
-│   │   ├── services/
-│   │   ├── persistence/
-│   │   ├── messaging/
-│   │   └── PaperlessRestApplication.java
-│   ├── src/main/resources/
-│   │   └── application.properties
-│   ├── Dockerfile
-│   └── pom.xml
+│   │   ├── controller/           # REST Controllers
+│   │   ├── services/             # Business Logic + Mappers
+│   │   ├── persistence/          # Entities + Repositories
+│   │   ├── messaging/            # RabbitMQ Producer
+│   │   └── config/               # Configuration Classes
+│   └── src/test/java/            # Unit + Integration Tests
 │
 ├── PaperlessServices/            # Worker Services (Port 8082)
 │   ├── src/main/java/com/fhtechnikum/paperlessservices/
-│   │   ├── consumer/
-│   │   ├── config/
-│   │   └── PaperlessServicesApplication.java
-│   ├── src/main/resources/
-│   │   └── application.properties
-│   ├── Dockerfile
-│   └── pom.xml
+│   │   ├── services/             # OCR + GenAI Workers
+│   │   ├── persistence/          # Elasticsearch Repository
+│   │   └── config/               # RabbitMQ + MinIO Config
+│   └── src/test/java/            # Unit Tests
 │
 ├── web-ui/                       # Frontend (Port 80)
 │   ├── static/
+│   │   ├── js/                   # JavaScript (documents.js, upload.js)
+│   │   └── css/                  # Stylesheets
 │   ├── Dockerfile
 │   └── nginx.conf
 │
-├── .env.sample                   # Environment template
+├── docs/                         # Documentation
+├── .env.example                  # Environment template
 ├── docker-compose.yml
-├── pom.xml
 └── README.md
 ```
 
@@ -51,10 +46,12 @@ SWEN3/
 |---------|------|-------------|
 | web-ui | 80 | Frontend (nginx) |
 | paperless-rest | 8081 | REST API Backend |
-| paperless-services | 8082 | OCR Worker (Tesseract) |
+| paperless-services | 8082 | OCR + GenAI Worker |
 | postgres | 5432 | PostgreSQL Database |
 | queue | 5672, 15672 | RabbitMQ Message Broker |
 | minio | 9000, 9090 | MinIO Object Storage |
+| elasticsearch | 9200 | Elasticsearch Search Engine |
+| kibana | 5601 | Kibana Dashboard |
 
 ## Prerequisites
 
@@ -63,90 +60,100 @@ SWEN3/
 - Docker Desktop
 - Docker Compose
 - Git
+- Google Gemini API Key (for AI summaries)
 
 ## Installation
 
-### Clone Repository
+### 1. Clone Repository
 
 ```bash
 git clone <repository-url>
 cd SWEN3
 ```
 
-### Environment Variables
+### 2. Environment Variables
 
-All environment variables are configured in the `.env` file. The project includes a `.env.sample` file with default values for Docker Compose.
-
-Copy and modify if needed:
+Copy the example environment file:
 ```bash
 cp .env.example .env
 ```
 
-Default values from `.env.sample`:
-
+Edit `.env` and add your Google Gemini API key:
 ```bash
-# Database Configuration
-POSTGRES_DB=paperless
-POSTGRES_USER=paperless
-POSTGRES_PASSWORD=paperless
-
-# RabbitMQ Configuration
-RABBITMQ_HOST=queue
-RABBITMQ_PORT=5672
-RABBITMQ_USER=guest
-RABBITMQ_PASSWORD=guest
-
-# Spring Datasource (for Docker)
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paperless
-SPRING_DATASOURCE_USERNAME=paperless
-SPRING_DATASOURCE_PASSWORD=paperless
-
-# Spring RabbitMQ
-SPRING_RABBITMQ_HOST=queue
-SPRING_RABBITMQ_PORT=5672
-SPRING_RABBITMQ_USERNAME=guest
-SPRING_RABBITMQ_PASSWORD=guest
+GEMINI_API_KEY=your-api-key-here
 ```
 
-These values work out-of-the-box for Docker Compose. For local development without Docker, the `application.properties` files contain localhost defaults.
-
-### Build Project
+### 3. Build and Start
 
 ```bash
-mvn clean install
-```
-
-### Build Docker Images
-
-```bash
+# Build Docker images
 docker compose build
-```
 
-## Starting the Project
-
-### With Docker Compose
-
-```bash
-docker compose up
-```
-
-All services start in foreground.
-
-```bash
+# Start all services
 docker compose up -d
 ```
 
-All services start in background.
+## Usage
+
+### Access Points
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| Frontend | http://localhost | - |
+| REST API | http://localhost:8081 | - |
+| Swagger UI | http://localhost:8081/swagger-ui.html | - |
+| RabbitMQ | http://localhost:15672 | guest / guest |
+| MinIO Console | http://localhost:9090 | minioadmin / minioadmin |
+| Kibana | http://localhost:5601 | - |
+
+### Upload a Document
+
+1. Go to http://localhost/upload.html
+2. Select a PDF/DOCX/TXT file (max 10MB)
+3. Enter title and author
+4. Click "Upload"
+5. The document will be processed automatically (OCR + AI Summary)
+
+### Search Documents
+
+1. Go to http://localhost/documents.html
+2. Enter a search term in the search bar
+3. Results include matches from document content AND notes
+
+### Add Notes to Documents
+
+1. Click on a document card to open details
+2. Scroll down to the "Notes" section
+3. Enter your note and click "Add Note"
+4. Notes are searchable via Elasticsearch
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/documents | Get all documents |
+| GET | /api/documents/{id} | Get document by ID |
+| POST | /api/documents | Upload new document |
+| PUT | /api/documents/{id} | Update document |
+| DELETE | /api/documents/{id} | Delete document |
+| GET | /api/documents/search?query= | Search documents |
+| GET | /api/documents/{id}/notes | Get notes for document |
+| POST | /api/documents/{id}/notes | Add note to document |
+| DELETE | /api/notes/{id} | Delete note |
+
+## Testing
+
+### Run Integration Tests
+
+```bash
+cd PaperlessREST
+mvn test -Dtest="*IntegrationTest"
+```
 
 
-## Access
+### Run All Tests
 
-After starting, the following URLs are available:
-
-- Frontend: http://localhost:80
-- REST API: http://localhost:8081
-- RabbitMQ Management: http://localhost:15672 (guest/guest)
-- MinIO Console: http://localhost:9090 (minioadmin/minioadmin)
-- PostgreSQL: http://localhost:5432 (paperless/paperless)
-- ElasticSearch: http://localhost:9200
+```bash
+mvn test
+```
 
