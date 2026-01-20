@@ -102,28 +102,24 @@ function escapeHtml(text) {
 }
 
 function deleteDocument(id) {
-    if (confirm('Are you sure you want to delete this document?')) {
-        fetch(`/api/documents/${id}`, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('Document deleted successfully');
-                    // Reload based on current mode
-                    if (isSearchMode) {
-                        searchDocuments();
-                    } else {
-                        loadDocumentsCards();
-                    }
+    fetch(`/api/documents/${id}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (response.ok) {
+                // Reload based on current mode
+                if (isSearchMode) {
+                    searchDocuments();
                 } else {
-                    alert('Error deleting document');
+                    loadDocumentsCards();
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error deleting document');
-            });
-    }
+            } else {
+                console.error('Error deleting document');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
 // Search documents by content
@@ -284,10 +280,11 @@ function displayNotes(documentId, notes) {
 
 // Add a new note to a document
 function addNote(documentId) {
-    const content = document.getElementById('newNoteContent').value.trim();
+    const textarea = document.getElementById('newNoteContent');
+    const content = textarea.value.trim();
 
     if (!content) {
-        alert('Please enter a note');
+        textarea.focus();
         return;
     }
 
@@ -301,7 +298,7 @@ function addNote(documentId) {
         .then(response => {
             if (response.ok) {
                 // Clear textarea
-                document.getElementById('newNoteContent').value = '';
+                textarea.value = '';
                 // Reload notes
                 // Remove old notes section first
                 const modalContent = document.getElementById('modalDocumentContent');
@@ -318,43 +315,39 @@ function addNote(documentId) {
                 }
                 loadNotes(documentId);
             } else {
-                alert('Error adding note');
+                console.error('Error adding note');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error adding note');
         });
 }
 
 // Delete a note by ID
 function deleteNoteById(noteId, documentId) {
-    if (confirm('Are you sure you want to delete this note?')) {
-        fetch(`/api/notes/${noteId}`, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Reload notes
-                    const modalContent = document.getElementById('modalDocumentContent');
-                    const notesHr = Array.from(modalContent.querySelectorAll('hr')).pop();
-                    if (notesHr) {
-                        let next = notesHr.nextElementSibling;
-                        notesHr.remove();
-                        while (next) {
-                            const current = next;
-                            next = next.nextElementSibling;
-                            current.remove();
-                        }
+    fetch(`/api/notes/${noteId}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (response.ok) {
+                // Reload notes
+                const modalContent = document.getElementById('modalDocumentContent');
+                const notesHr = Array.from(modalContent.querySelectorAll('hr')).pop();
+                if (notesHr) {
+                    let next = notesHr.nextElementSibling;
+                    notesHr.remove();
+                    while (next) {
+                        const current = next;
+                        next = next.nextElementSibling;
+                        current.remove();
                     }
-                    loadNotes(documentId);
-                } else {
-                    alert('Error deleting note');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error deleting note');
-            });
-    }
+                loadNotes(documentId);
+            } else {
+                console.error('Error deleting note');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
