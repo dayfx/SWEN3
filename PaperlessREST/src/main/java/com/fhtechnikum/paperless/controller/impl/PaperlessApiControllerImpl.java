@@ -2,9 +2,14 @@ package com.fhtechnikum.paperless.controller.impl;
 
 import com.fhtechnikum.paperless.controller.PaperlessApi;
 import com.fhtechnikum.paperless.persistence.entity.DocumentEntity;
+import com.fhtechnikum.paperless.persistence.entity.NoteEntity;
 import com.fhtechnikum.paperless.services.dto.Document;
+import com.fhtechnikum.paperless.services.dto.Note;
+import com.fhtechnikum.paperless.services.dto.NoteRequest;
 import com.fhtechnikum.paperless.services.DocumentService;
+import com.fhtechnikum.paperless.services.NoteService;
 import com.fhtechnikum.paperless.services.mapper.DocumentMapper;
+import com.fhtechnikum.paperless.services.mapper.NoteMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +38,12 @@ public class PaperlessApiControllerImpl implements PaperlessApi {
 
     @Autowired
     private DocumentMapper documentMapper;
+
+    @Autowired
+    private NoteService noteService;
+
+    @Autowired
+    private NoteMapper noteMapper;
 
     @Override
     public ResponseEntity<Document> uploadDocument(MultipartFile file, String title, String author) {
@@ -160,6 +171,69 @@ public class PaperlessApiControllerImpl implements PaperlessApi {
         } catch (Exception e) {
             log.error("Elasticsearch error during search: {}", e.getMessage(), e);
             return ResponseEntity.status(500).build(); // Internal Server Error
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<Note>> getDocumentNotes(Long id) {
+        try {
+            log.info("Fetching notes for document ID: {}", id);
+
+            // Service returns entities
+            List<NoteEntity> entities = noteService.getNotesForDocument(id);
+
+            // Controller handles DTO mapping
+            List<Note> notes = entities.stream()
+                    .map(noteMapper::toDto)
+                    .collect(Collectors.toList());
+
+            log.info("Found {} notes for document ID: {}", notes.size(), id);
+            return ResponseEntity.ok(notes);
+        } catch (DataAccessException e) {
+            log.error("Database error while fetching notes for document {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(503).build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<Note> addDocumentNote(Long id, NoteRequest noteRequest) {
+        try {
+            log.info("Adding note to document ID: {}", id);
+
+            // Service returns entity
+            NoteEntity entity = noteService.addNote(id, noteRequest.getContent());
+
+            // Controller handles DTO mapping
+            Note note = noteMapper.toDto(entity);
+
+            log.info("Note created successfully with ID: {}", note.getId());
+            return ResponseEntity.status(201).body(note);
+        } catch (DataAccessException e) {
+            log.error("Database error while adding note: {}", e.getMessage(), e);
+            return ResponseEntity.status(503).build();
+        } catch (RuntimeException e) {
+            // Document not found or other runtime errors
+            log.error("Error adding note to document {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteNote(Long id) {
+        try {
+            log.info("Deleting note ID: {}", id);
+
+            boolean deleted = noteService.deleteNote(id);
+            if (deleted) {
+                log.info("Note deleted successfully: {}", id);
+                return ResponseEntity.noContent().build();
+            }
+
+            log.warn("Note not found: {}", id);
+            return ResponseEntity.notFound().build();
+        } catch (DataAccessException e) {
+            log.error("Database error while deleting note {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(503).build();
         }
     }
 }

@@ -79,6 +79,9 @@ function viewDocument(id) {
 
             document.getElementById('modalDocumentContent').innerHTML = metadata + summarySection + contentSection;
 
+            // Load and display notes
+            loadNotes(doc.id);
+
             documentModal.show();
         })
         .catch(error => {
@@ -99,28 +102,24 @@ function escapeHtml(text) {
 }
 
 function deleteDocument(id) {
-    if (confirm('Are you sure you want to delete this document?')) {
-        fetch(`/api/documents/${id}`, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('Document deleted successfully');
-                    // Reload based on current mode
-                    if (isSearchMode) {
-                        searchDocuments();
-                    } else {
-                        loadDocumentsCards();
-                    }
+    fetch(`/api/documents/${id}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (response.ok) {
+                // Reload based on current mode
+                if (isSearchMode) {
+                    searchDocuments();
                 } else {
-                    alert('Error deleting document');
+                    loadDocumentsCards();
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error deleting document');
-            });
-    }
+            } else {
+                console.error('Error deleting document');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
 // Search documents by content
@@ -227,4 +226,128 @@ function displayDocuments(data, searchQuery = null) {
         `;
         cardsContainer.insertAdjacentHTML('beforeend', cardHTML);
     });
+}
+
+// Load and display notes for a document
+function loadNotes(documentId) {
+    fetch(`/api/documents/${documentId}/notes`)
+        .then(response => response.json())
+        .then(notes => {
+            displayNotes(documentId, notes);
+        })
+        .catch(error => {
+            console.error('Error loading notes:', error);
+            displayNotes(documentId, []);
+        });
+}
+
+// Display notes in the modal
+function displayNotes(documentId, notes) {
+    let notesSection = `
+        <hr>
+        <h5>Notes</h5>
+        <div class="mb-3">
+            <textarea id="newNoteContent" class="form-control" rows="2" placeholder="Add a note..."></textarea>
+            <button class="btn btn-primary btn-sm mt-2" onclick="addNote(${documentId})">Add Note</button>
+        </div>
+    `;
+
+    if (notes.length === 0) {
+        notesSection += '<p class="text-muted">No notes yet.</p>';
+    } else {
+        notesSection += '<div class="list-group">';
+        notes.forEach(note => {
+            const date = new Date(note.createdDate).toLocaleString();
+            notesSection += `
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <p class="mb-1">${escapeHtml(note.content)}</p>
+                            <small class="text-muted">${date}</small>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteNoteById(${note.id}, ${documentId})">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+        notesSection += '</div>';
+    }
+
+    // Append notes section to modal content
+    const modalContent = document.getElementById('modalDocumentContent');
+    modalContent.insertAdjacentHTML('beforeend', notesSection);
+}
+
+// Add a new note to a document
+function addNote(documentId) {
+    const textarea = document.getElementById('newNoteContent');
+    const content = textarea.value.trim();
+
+    if (!content) {
+        textarea.focus();
+        return;
+    }
+
+    fetch(`/api/documents/${documentId}/notes`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content: content })
+    })
+        .then(response => {
+            if (response.ok) {
+                // Clear textarea
+                textarea.value = '';
+                // Reload notes
+                // Remove old notes section first
+                const modalContent = document.getElementById('modalDocumentContent');
+                const notesHr = Array.from(modalContent.querySelectorAll('hr')).pop();
+                if (notesHr) {
+                    // Remove everything after the last hr (the notes section)
+                    let next = notesHr.nextElementSibling;
+                    notesHr.remove();
+                    while (next) {
+                        const current = next;
+                        next = next.nextElementSibling;
+                        current.remove();
+                    }
+                }
+                loadNotes(documentId);
+            } else {
+                console.error('Error adding note');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+// Delete a note by ID
+function deleteNoteById(noteId, documentId) {
+    fetch(`/api/notes/${noteId}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (response.ok) {
+                // Reload notes
+                const modalContent = document.getElementById('modalDocumentContent');
+                const notesHr = Array.from(modalContent.querySelectorAll('hr')).pop();
+                if (notesHr) {
+                    let next = notesHr.nextElementSibling;
+                    notesHr.remove();
+                    while (next) {
+                        const current = next;
+                        next = next.nextElementSibling;
+                        current.remove();
+                    }
+                }
+                loadNotes(documentId);
+            } else {
+                console.error('Error deleting note');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }

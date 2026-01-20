@@ -6,6 +6,8 @@
 package com.fhtechnikum.paperless.controller;
 
 import com.fhtechnikum.paperless.services.dto.Document;
+import com.fhtechnikum.paperless.services.dto.Note;
+import com.fhtechnikum.paperless.services.dto.NoteRequest;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-07T17:31:27.030566015Z[Etc/UTC]", comments = "Generator version: 7.19.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-19T16:22:53.698489191Z[Etc/UTC]", comments = "Generator version: 7.19.0-SNAPSHOT")
 @Validated
 @Tag(name = "paperless", description = "Paperless Document Management REST-API")
 public interface PaperlessApi {
@@ -42,6 +44,50 @@ public interface PaperlessApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_ADD_DOCUMENT_NOTE = "/api/documents/{id}/notes";
+    /**
+     * POST /api/documents/{id}/notes : Add a note to a document
+     *
+     * @param id The id of the document (required)
+     * @param noteRequest  (required)
+     * @return Note created successfully (status code 201)
+     *         or Document not found (status code 404)
+     */
+    @Operation(
+        operationId = "addDocumentNote",
+        summary = "Add a note to a document",
+        tags = { "paperless" },
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Note created successfully", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Note.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Document not found")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = PaperlessApi.PATH_ADD_DOCUMENT_NOTE,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Note> addDocumentNote(
+        @NotNull @Parameter(name = "id", description = "The id of the document", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "NoteRequest", description = "", required = true) @Valid @RequestBody NoteRequest noteRequest
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"documentId\" : 6, \"id\" : 0, \"content\" : \"content\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_DELETE_DOCUMENT = "/api/documents/{id}";
     /**
@@ -66,6 +112,35 @@ public interface PaperlessApi {
     )
     default ResponseEntity<Void> deleteDocument(
         @NotNull @Parameter(name = "id", description = "The id of the document", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_DELETE_NOTE = "/api/notes/{id}";
+    /**
+     * DELETE /api/notes/{id} : Delete a note by id
+     *
+     * @param id The id of the note (required)
+     * @return Note deleted successfully (status code 204)
+     *         or Note not found (status code 404)
+     */
+    @Operation(
+        operationId = "deleteNote",
+        summary = "Delete a note by id",
+        tags = { "paperless" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Note deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Note not found")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = PaperlessApi.PATH_DELETE_NOTE
+    )
+    default ResponseEntity<Void> deleteNote(
+        @NotNull @Parameter(name = "id", description = "The id of the note", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -103,6 +178,47 @@ public interface PaperlessApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"summary\" : \"summary\", \"uploadDate\" : \"2000-01-23T04:56:07.000+00:00\", \"fileSize\" : 6, \"author\" : \"author\", \"id\" : 0, \"mimeType\" : \"mimeType\", \"title\" : \"title\", \"content\" : \"content\", \"originalFilename\" : \"originalFilename\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_DOCUMENT_NOTES = "/api/documents/{id}/notes";
+    /**
+     * GET /api/documents/{id}/notes : Get all notes for a document
+     *
+     * @param id The id of the document (required)
+     * @return Success (status code 200)
+     *         or Document not found (status code 404)
+     */
+    @Operation(
+        operationId = "getDocumentNotes",
+        summary = "Get all notes for a document",
+        tags = { "paperless" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Success", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Note.class)))
+            }),
+            @ApiResponse(responseCode = "404", description = "Document not found")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = PaperlessApi.PATH_GET_DOCUMENT_NOTES,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<Note>> getDocumentNotes(
+        @NotNull @Parameter(name = "id", description = "The id of the document", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"documentId\" : 6, \"id\" : 0, \"content\" : \"content\" }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"documentId\" : 6, \"id\" : 0, \"content\" : \"content\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
